@@ -77,9 +77,9 @@ export default function Navbar() {
                             "font-display text-2xl transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-coral focus:ring-offset-2 rounded-lg px-2 py-1",
                             isScrolled ? "text-ocean-deep" : "text-white"
                         )}
-                        aria-label="Dale's Staycation - Home"
+                        aria-label="Adam's Staycation - Home"
                     >
-                        Dale&apos;s Staycation
+                        Adam&apos;s Staycation
                     </a>
 
                     {/* Desktop Navigation */}

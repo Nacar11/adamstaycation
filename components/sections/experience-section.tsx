@@ -382,7 +382,7 @@ export default function ExperienceSection() {
                                         About This Space
                                     </span>
                                     <h3 className="font-display text-3xl md:text-4xl text-ocean-deep mb-6">
-                                        Mabuhay! Welcome to Dale&apos;s Staycation
+                                        Mabuhay! Welcome to Adam&apos;s Staycation
                                     </h3>
                                     <p className="text-ocean/80 text-lg leading-relaxed mb-8">
                                         Experience luxury living at Tambuli Seaside Living — a premier

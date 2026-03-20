@@ -31,7 +31,7 @@ export default function LandingSection() {
         <section
             id="home"
             className="relative min-h-screen flex items-center justify-center overflow-hidden"
-            aria-label="Welcome to Dale's Staycation"
+            aria-label="Welcome to Adam's Staycation"
         >
             {/* Background with gradient overlay */}
             <div
@@ -75,7 +75,7 @@ export default function LandingSection() {
                         className="font-display text-5xl md:text-7xl lg:text-8xl text-white mb-6 tracking-tight"
                         style={{ textShadow: '2px 4px 8px rgba(0,0,0,0.3)' }}
                     >
-                        Dale&apos;s Staycation
+                        Adam&apos;s Staycation
                     </TextAnimate>
                 </BlurFade>
 

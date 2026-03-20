@@ -15,20 +15,20 @@ const playfair = Playfair_Display({
 })
 
 export const metadata: Metadata = {
-    title: 'Dale\'s Staycation | Luxury Condo Rental at Tambuli Seaside Living, Cebu',
+    title: "Adam's Staycation",
     description: 'Book your luxury staycation at Tambuli Seaside Living in Lapu-Lapu City, Cebu. One bedroom condo with pool access, beach access, and resort amenities.',
     keywords: 'Cebu staycation, Tambuli resort rental, Lapu-Lapu condo, Mactan accommodation, beach resort Cebu, luxury condo rental Philippines',
     openGraph: {
-        title: 'Dale\'s Staycation | Luxury Cebu Staycation',
+        title: 'Adam\'s Staycation | Luxury Cebu Staycation',
         description: 'Your luxury escape at Tambuli Seaside Living',
         url: 'https://dalestaycation.com',
-        siteName: 'Dale\'s Staycation',
+        siteName: 'Adam\'s Staycation',
         type: 'website',
         locale: 'en_US',
     },
     twitter: {
         card: 'summary_large_image',
-        title: 'Dale\'s Staycation | Luxury Cebu Staycation',
+        title: 'Adam\'s Staycation | Luxury Cebu Staycation',
         description: 'Your luxury escape at Tambuli Seaside Living',
     },
 }

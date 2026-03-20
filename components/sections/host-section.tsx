@@ -1,23 +1,37 @@
 'use client'
 
 import Image from 'next/image'
-import { ExternalLink, Mail, MapPin } from 'lucide-react'
+import { Mail, Phone, MapPin, ExternalLink } from 'lucide-react'
 import { AIRBNB_LISTING_URL, CONTACT_EMAIL } from '@/lib/constants'
 import { BlurFade } from '@/components/ui/blur-fade'
 import { TextAnimate } from '@/components/ui/text-animate'
 import { NeonGradientCard } from '@/components/ui/neon-gradient-card'
 import { ShimmerButton } from '@/components/ui/shimmer-button'
-import { NumberTicker } from '@/components/ui/number-ticker'
 import { MagicCard } from '@/components/ui/magic-card'
 
 const STAGGER_DELAY = 0.1
 const BASE_DELAY = 0.2
 
-// Trust indicators with numeric values for animation
-const trustStats = [
-    { value: 5.0, label: 'Rating', suffix: '', decimals: 1 },
-    { value: 50, label: 'Reviews', suffix: '+', decimals: 0 },
-    { value: 100, label: 'Response Rate', suffix: '%', decimals: 0 },
+// Contact information for business cards
+const contactInfo = [
+    { 
+        icon: Mail, 
+        label: 'Email', 
+        value: 'nacariodale@gmail.com',
+        href: 'mailto:nacariodale@gmail.com'
+    },
+    { 
+        icon: Phone, 
+        label: 'Phone', 
+        value: '0926-003-2484',
+        href: 'tel:09260032484'
+    },
+    { 
+        icon: MapPin, 
+        label: 'Location', 
+        value: 'Tambuli Seaside Resort and Spa',
+        href: 'https://www.google.com/maps/place/Tambuli+Seaside+Resort+and+Spa/@10.2899858,124.0020002,17z/data=!3m1!4b1!4m9!3m8!1s0x33a99732246dcbc5:0x61ef43a187a2080a!5m2!4m1!1i2!8m2!3d10.2899858!4d124.0068711!16s%2Fg%2F11h_3t257r?entry=ttu&g_ep=EgoyMDI2MDMxNy4wIKXMDSoASAFQAw%3D%3D'
+    },
 ]
 
 export default function HostSection() {
@@ -148,28 +162,39 @@ export default function HostSection() {
                     </NeonGradientCard>
                 </BlurFade>
 
-                {/* Trust Indicators */}
+                {/* Contact Information Cards */}
                 <BlurFade delay={BASE_DELAY + STAGGER_DELAY * 7} inView>
-                    <div className="grid grid-cols-3 gap-6 mt-16">
-                        {trustStats.map((stat, index) => (
-                            <BlurFade key={stat.label} delay={BASE_DELAY + STAGGER_DELAY * (8 + index)} inView>
-                                <MagicCard
-                                    className="text-center p-6 rounded-2xl bg-white border border-sand-dark/10"
-                                    gradientColor="rgba(30, 77, 92, 0.08)"
-                                    gradientSize={150}
-                                >
-                                    <p className="text-3xl md:text-4xl font-display text-ocean-deep mb-1">
-                                        <NumberTicker
-                                            value={stat.value}
-                                            decimalPlaces={stat.decimals}
-                                            className="text-ocean-deep"
-                                        />
-                                        {stat.suffix}
-                                    </p>
-                                    <p className="text-sm text-ocean/70">{stat.label}</p>
-                                </MagicCard>
-                            </BlurFade>
-                        ))}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
+                        {contactInfo.map((contact, index) => {
+                            const Icon = contact.icon
+                            return (
+                                <BlurFade key={contact.label} delay={BASE_DELAY + STAGGER_DELAY * (8 + index)} inView>
+                                    <MagicCard
+                                        className="text-center p-6 rounded-2xl bg-white border border-sand-dark/10 hover:shadow-lg transition-all duration-300"
+                                        gradientColor="rgba(30, 77, 92, 0.08)"
+                                        gradientSize={150}
+                                    >
+                                        <a
+                                            href={contact.href}
+                                            className="block group"
+                                            aria-label={`Contact via ${contact.label}`}
+                                        >
+                                            <div className="flex justify-center mb-4">
+                                                <div className="p-3 rounded-full bg-ocean-light group-hover:bg-ocean transition-colors duration-300">
+                                                    <Icon className="w-6 h-6 text-ocean group-hover:text-white transition-colors duration-300" aria-hidden="true" />
+                                                </div>
+                                            </div>
+                                            <h3 className="font-semibold text-ocean-deep mb-2 group-hover:text-coral transition-colors duration-300">
+                                                {contact.label}
+                                            </h3>
+                                            <p className="text-ocean/80 text-sm leading-relaxed">
+                                                {contact.value}
+                                            </p>
+                                        </a>
+                                    </MagicCard>
+                                </BlurFade>
+                            )
+                        })}
                     </div>
                 </BlurFade>
             </div>
@@ -181,7 +206,7 @@ export default function HostSection() {
                         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                             {/* Brand */}
                             <span className="font-display text-xl text-ocean-deep">
-                                Dale&apos;s Staycation
+                                Adam&apos;s Staycation
                             </span>
 
                             {/* Copyright */}
