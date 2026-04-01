@@ -137,18 +137,13 @@ const galleryCategories: GalleryCategory[] = [
         title: 'The Studio',
         description: 'Your luxury one-bedroom sanctuary',
         images: [
-            { src: '/images/IMG_2110.jpeg', alt: 'Modern studio living area view' },
-            { src: '/images/IMG_2111.jpeg', alt: 'Elegant studio interior details' },
-            { src: '/images/IMG_2112.jpeg', alt: 'Luxury studio bedroom corner' },
-            { src: '/images/IMG_2113.jpeg', alt: 'Studio space with natural light' },
-            { src: '/images/IMG_2114.jpeg', alt: 'Modern studio furniture and layout' },
-            { src: '/images/studio-panoramic.jpg', alt: 'Panoramic studio view with living area' },
-            { src: '/images/studio-wideangle.jpg', alt: 'Wide angle view of studio layout' },
-            { src: '/images/bedroom-frontview.jpg', alt: 'Bedroom with premium bedding' },
-            { src: '/images/bedroom-windowview.jpg', alt: 'Bedroom with natural lighting' },
-            { src: '/images/bedroom-mirror.jpg', alt: 'Bedroom mirror and wardrobe area' },
-            { src: '/images/balcony-dayview.jpg', alt: 'Private balcony with city view' },
-            { src: '/images/balcony-nightview.jpg', alt: 'Balcony ambiance at night' },
+            { src: '/images/photo-gallery-studio-1.jpg', alt: 'Photo gallery studio 1' },
+            { src: '/images/photo-gallery-studio-2.jpg', alt: 'Photo gallery studio 2' },
+            { src: '/images/photo-gallery-studio-3.jpg', alt: 'Photo gallery studio 3' },
+            { src: '/images/photo-gallery-studio-4.jpg', alt: 'Photo gallery studio 4' },
+            { src: '/images/photo-gallery-studio-5.jpg', alt: 'Photo gallery studio 5' },
+            { src: '/images/photo-gallery-studio-6.jpg', alt: 'Photo gallery studio 6' },
+            { src: '/images/photo-gallery-studio-7.jpg', alt: 'Photo gallery studio 7' },
         ],
     },
     {
@@ -156,8 +151,8 @@ const galleryCategories: GalleryCategory[] = [
         title: 'Kitchen & Dining',
         description: 'Fully equipped for your culinary needs',
         images: [
-            { src: '/images/kitchenette.jpg', alt: 'Modern kitchenette with appliances' },
-            { src: '/images/dining-kitchen-area.jpg', alt: 'Dining area with kitchen view' },
+            { src: '/images/photo-gallery-kitchen-1.jpg', alt: 'Photo gallery kitchen 1' },
+            { src: '/images/photo-gallery-kitchen-2.jpg', alt: 'Photo gallery kitchen 2' },
         ],
     },
     {
@@ -165,8 +160,9 @@ const galleryCategories: GalleryCategory[] = [
         title: 'Bathroom',
         description: 'Modern and well-appointed',
         images: [
-            { src: '/images/bathroom-fullview.jpg', alt: 'Full bathroom with modern fixtures' },
-            { src: '/images/bathroom-vanity.jpg', alt: 'Bathroom vanity and washing machine' },
+            { src: '/images/photo-gallery-bathroom-1.jpg', alt: 'Photo gallery bathroom 1' },
+            { src: '/images/photo-gallery-bathroom-2.jpg', alt: 'Photo gallery bathroom 2' },
+            { src: '/images/photo-gallery-bathroom-3.jpg', alt: 'Photo gallery bathroom 3' },
         ],
     },
     {
@@ -176,6 +172,16 @@ const galleryCategories: GalleryCategory[] = [
         images: [
             { src: '/images/pool-swimup-bar.jpg', alt: 'Infinity pool with swim-up bar' },
             { src: '/images/pool-exterior.jpg', alt: 'Resort pool with lounge area' },
+        ],
+    },
+    {
+        id: 'balcony',
+        title: 'Balcony',
+        description: 'Private outdoor space with views',
+        images: [
+            { src: '/images/photo-gallery-balcony-1.jpg', alt: 'Photo gallery balcony 1' },
+            { src: '/images/photo-gallery-balcony-2.jpg', alt: 'Photo gallery balcony 2' },
+            { src: '/images/photo-gallery-balcony-3.jpg', alt: 'Photo gallery balcony 3' },
         ],
     },
     {
