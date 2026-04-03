@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect, useCallback } from 'react'
 import { ChevronDown, MapPin } from 'lucide-react'
 import { AIRBNB_LISTING_URL } from '@/lib/constants'
 import { BlurFade } from '@/components/ui/blur-fade'
@@ -11,8 +12,27 @@ import { cn } from '@/lib/utils'
 
 const STAGGER_DELAY = 0.1
 const BASE_DELAY = 0.2
+const SLIDE_DURATION = 7000
+
+const heroImages = [
+    { src: '/images/banner/landing-page-1.jpg', origin: '30% 60%' },
+    { src: '/images/banner/landing-page-2.jpg', origin: '70% 40%' },
+    { src: '/images/banner/landing-page-3.jpg', origin: '50% 30%' },
+    { src: '/images/banner/landing-page-4.jpg', origin: '40% 70%' },
+]
 
 export default function LandingSection() {
+    const [currentImageIndex, setCurrentImageIndex] = useState(0)
+
+    const advanceImage = useCallback(() => {
+        setCurrentImageIndex((prev) => (prev + 1) % heroImages.length)
+    }, [])
+
+    useEffect(() => {
+        const interval = setInterval(advanceImage, SLIDE_DURATION)
+        return () => clearInterval(interval)
+    }, [advanceImage])
+
     const scrollToSection = (id: string) => {
         const element = document.getElementById(id)
         if (element) {
@@ -33,14 +53,36 @@ export default function LandingSection() {
             className="relative min-h-screen flex items-center justify-center overflow-hidden"
             aria-label="Welcome to Adam's Staycation"
         >
-            {/* Background with gradient overlay */}
-            <div
-                className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                style={{
-                    backgroundImage: `linear-gradient(to bottom, rgba(13, 43, 51, 0.5), rgba(13, 43, 51, 0.8)), 
-                        url('https://images.unsplash.com/photo-1540541338287-41700207dee6?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')`,
-                }}
-            />
+            {/* Ken Burns Background Carousel */}
+            <div className="absolute inset-0" aria-hidden="true">
+                {heroImages.map((img, index) => (
+                    <div
+                        key={img.src}
+                        className="absolute inset-0 transition-opacity duration-[1500ms] ease-in-out"
+                        style={{ opacity: index === currentImageIndex ? 1 : 0 }}
+                    >
+                        <img
+                            src={img.src}
+                            alt=""
+                            className="absolute inset-0 w-full h-full object-cover will-change-transform"
+                            style={{
+                                transformOrigin: img.origin,
+                                transform: index === currentImageIndex ? 'scale(1.15)' : 'scale(1)',
+                                transition: index === currentImageIndex
+                                    ? `transform ${SLIDE_DURATION + 1500}ms ease-out`
+                                    : 'transform 1.5s ease-in-out',
+                            }}
+                        />
+                    </div>
+                ))}
+                {/* Gradient overlay */}
+                <div
+                    className="absolute inset-0"
+                    style={{
+                        background: 'linear-gradient(to bottom, rgba(13, 43, 51, 0.45), rgba(13, 43, 51, 0.75))',
+                    }}
+                />
+            </div>
 
             {/* Particles Background Effect */}
             <Particles
@@ -128,6 +170,23 @@ export default function LandingSection() {
                         </button>
                     </div>
                 </BlurFade>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-10 flex gap-2 w-48">
+                {heroImages.map((_, index) => (
+                    <div key={index} className="flex-1 h-[2px] bg-white/20 rounded-full overflow-hidden">
+                        {index === currentImageIndex && (
+                            <div
+                                key={`progress-${currentImageIndex}`}
+                                className="h-full bg-white/70 rounded-full origin-left"
+                                style={{
+                                    animation: `hero-progress ${SLIDE_DURATION}ms linear forwards`,
+                                }}
+                            />
+                        )}
+                    </div>
+                ))}
             </div>
 
             {/* Scroll Indicator */}

@@ -74,6 +74,12 @@ interface GalleryCategory {
     images: GalleryImage[]
 }
 
+interface GalleryGroup {
+    id: string
+    title: string
+    categories: GalleryCategory[]
+}
+
 // Featured highlights - the "wow" factors with premium styling
 const featuredHighlights: FeaturedHighlight[] = [
     {
@@ -130,114 +136,137 @@ const roomSpecs: RoomSpec[] = [
     { icon: Maximize, value: '35', numericValue: 35, label: 'sqm Space' },
 ]
 
-// Gallery categories
-const galleryCategories: GalleryCategory[] = [
+// Gallery groups
+const galleryGroups: GalleryGroup[] = [
     {
-        id: 'studio',
-        title: 'The Studio',
-        description: 'Your luxury one-bedroom sanctuary',
-        images: [
-            { src: '/images/studio/photo-gallery-studio-1.jpg', alt: 'Photo gallery studio 1' },
-            { src: '/images/studio/photo-gallery-studio-2.jpg', alt: 'Photo gallery studio 2' },
-            { src: '/images/studio/photo-gallery-studio-3.jpg', alt: 'Photo gallery studio 3' },
-            { src: '/images/studio/photo-gallery-studio-4.jpg', alt: 'Photo gallery studio 4' },
-            { src: '/images/studio/photo-gallery-studio-5.jpg', alt: 'Photo gallery studio 5' },
-            { src: '/images/studio/photo-gallery-studio-6.jpg', alt: 'Photo gallery studio 6' },
-            { src: '/images/studio/photo-gallery-studio-7.jpg', alt: 'Photo gallery studio 7' },
+        id: 'the-suite',
+        title: 'The Suite',
+        categories: [
+            {
+                id: 'studio',
+                title: 'The Studio',
+                description: 'Your luxury one-bedroom sanctuary',
+                images: [
+                    { src: '/images/studio/photo-gallery-studio-1.jpg', alt: 'Spacious studio with floor-to-ceiling curtains' },
+                    { src: '/images/studio/photo-gallery-studio-2.jpg', alt: 'Cozy queen bed with wooden headboard' },
+                    { src: '/images/studio/photo-gallery-studio-3.jpg', alt: 'Studio living area with elegant decor' },
+                    { src: '/images/studio/photo-gallery-studio-4.jpg', alt: 'Studio interior with natural lighting' },
+                    { src: '/images/studio/photo-gallery-studio-5.jpg', alt: 'Studio sleeping area with queen bed' },
+                    { src: '/images/studio/photo-gallery-studio-6.jpg', alt: 'Studio entertainment and relaxation space' },
+                    { src: '/images/studio/photo-gallery-studio-7.jpg', alt: 'Studio workspace and desk area' },
+                    { src: '/images/studio/photo-gallery-studio-8.jpg', alt: 'Studio ambient evening lighting' },
+                ],
+            },
+            {
+                id: 'kitchen-dining',
+                title: 'Kitchen & Dining',
+                description: 'Fully equipped for your culinary needs',
+                images: [
+                    { src: '/images/kitchen/photo-gallery-kitchen-1.jpg', alt: 'Modern kitchen with full appliances' },
+                    { src: '/images/kitchen/photo-gallery-kitchen-2.jpg', alt: 'Kitchen dining area setup' },
+                ],
+            },
+            {
+                id: 'bathroom',
+                title: 'Bathroom',
+                description: 'Modern and well-appointed',
+                images: [
+                    { src: '/images/bathroom/photo-gallery-bathroom-1.jpg', alt: 'Modern bathroom with rain shower' },
+                    { src: '/images/bathroom/photo-gallery-bathroom-2.jpg', alt: 'Bathroom vanity and mirror area' },
+                    { src: '/images/bathroom/photo-gallery-bathroom-3.jpg', alt: 'Bathroom amenities and fixtures' },
+                ],
+            },
+            {
+                id: 'balcony',
+                title: 'Balcony',
+                description: 'Private outdoor space with views',
+                images: [
+                    { src: '/images/balcony/photo-gallery-balcony-1.jpg', alt: 'Balcony with resort view' },
+                    { src: '/images/balcony/photo-gallery-balcony-2.jpg', alt: 'Private balcony seating area' },
+                    { src: '/images/balcony/photo-gallery-balcony-3.jpg', alt: 'Balcony sunset view' },
+                ],
+            },
         ],
     },
     {
-        id: 'kitchen-dining',
-        title: 'Kitchen & Dining',
-        description: 'Fully equipped for your culinary needs',
-        images: [
-            { src: '/images/kitchen/photo-gallery-kitchen-1.jpg', alt: 'Photo gallery kitchen 1' },
-            { src: '/images/kitchen/photo-gallery-kitchen-2.jpg', alt: 'Photo gallery kitchen 2' },
-        ],
-    },
-    {
-        id: 'bathroom',
-        title: 'Bathroom',
-        description: 'Modern and well-appointed',
-        images: [
-            { src: '/images/bathroom/photo-gallery-bathroom-1.jpg', alt: 'Photo gallery bathroom 1' },
-            { src: '/images/bathroom/photo-gallery-bathroom-2.jpg', alt: 'Photo gallery bathroom 2' },
-            { src: '/images/bathroom/photo-gallery-bathroom-3.jpg', alt: 'Photo gallery bathroom 3' },
-        ],
-    },
-    {
-        id: 'pools',
-        title: 'Pools',
-        description: 'Multiple pools for your enjoyment',
-        images: [
-            { src: '/images/pool/photo-gallery-pool-1.jpg', alt: 'Photo gallery pool 1' },
-            { src: '/images/pool/photo-gallery-pool-2.jpg', alt: 'Photo gallery pool 2' },
-            { src: '/images/pool/photo-gallery-pool-3.jpg', alt: 'Photo gallery pool 3' },
-            { src: '/images/pool/photo-gallery-pool-4.jpg', alt: 'Photo gallery pool 4' },
-            { src: '/images/pool/photo-gallery-pool-5.jpg', alt: 'Photo gallery pool 5' },
-            { src: '/images/pool/photo-gallery-pool-6.jpg', alt: 'Photo gallery pool 6' },
-            { src: '/images/pool/photo-gallery-pool-7.jpg', alt: 'Photo gallery pool 7' },
-        ],
-    },
-    {
-        id: 'beach',
-        title: 'Beach',
-        description: 'Beautiful beachfront access',
-        images: [
-            { src: '/images/beach/photo-gallery-beach-1.jpg', alt: 'Photo gallery beach 1' },
-            { src: '/images/beach/photo-gallery-beach-2.jpg', alt: 'Photo gallery beach 2' },
-            { src: '/images/beach/photo-gallery-beach-3.jpg', alt: 'Photo gallery beach 3' },
-            { src: '/images/beach/photo-gallery-beach-4.jpg', alt: 'Photo gallery beach 4' },
-            { src: '/images/beach/photo-gallery-beach-5.jpg', alt: 'Photo gallery beach 5' },
-            { src: '/images/beach/photo-gallery-beach-6.jpg', alt: 'Photo gallery beach 6' },
-            { src: '/images/beach/photo-gallery-beach-7.jpg', alt: 'Photo gallery beach 7' },
-            { src: '/images/beach/photo-gallery-beach-8.jpg', alt: 'Photo gallery beach 8' },
-        ],
-    },
-    {
-        id: 'gym',
-        title: 'Gym',
-        description: 'State-of-the-art fitness facilities',
-        images: [
-            { src: '/images/gym/photo-gallery-gym-1.jpg', alt: 'Photo gallery gym 1' },
-            { src: '/images/gym/photo-gallery-gym-2.jpg', alt: 'Photo gallery gym 2' },
-            { src: '/images/gym/photo-gallery-gym-3.jpg', alt: 'Photo gallery gym 3' },
-            { src: '/images/gym/photo-gallery-gym-4.jpg', alt: 'Photo gallery gym 4' },
-            { src: '/images/gym/photo-gallery-gym-5.jpg', alt: 'Photo gallery gym 5' },
-            { src: '/images/gym/photo-gallery-gym-6.jpg', alt: 'Photo gallery gym 6' },
-            { src: '/images/gym/photo-gallery-gym-7.jpg', alt: 'Photo gallery gym 7' },
-            { src: '/images/gym/photo-gallery-gym-8.jpg', alt: 'Photo gallery gym 8' },
-        ],
-    },
-    {
-        id: 'balcony',
-        title: 'Balcony',
-        description: 'Private outdoor space with views',
-        images: [
-            { src: '/images/balcony/photo-gallery-balcony-1.jpg', alt: 'Photo gallery balcony 1' },
-            { src: '/images/balcony/photo-gallery-balcony-2.jpg', alt: 'Photo gallery balcony 2' },
-            { src: '/images/balcony/photo-gallery-balcony-3.jpg', alt: 'Photo gallery balcony 3' },
-        ],
-    },
-    {
-        id: 'frontdesk',
-        title: 'Frontdesk',
-        description: 'Professional reception and service area',
-        images: [
-            { src: '/images/frontdesk/photo-gallery-frontdesk-1.jpg', alt: 'Photo gallery frontdesk 1' },
-            { src: '/images/frontdesk/photo-gallery-frontdesk-2.jpg', alt: 'Photo gallery frontdesk 2' },
-            { src: '/images/frontdesk/photo-gallery-frontdesk-3.jpg', alt: 'Photo gallery frontdesk 3' },
-            { src: '/images/frontdesk/photo-gallery-frontdesk-4.jpg', alt: 'Photo gallery frontdesk 4' },
-            { src: '/images/frontdesk/photo-gallery-frontdesk-5.jpg', alt: 'Photo gallery frontdesk 5' },
-            { src: '/images/frontdesk/photo-gallery-frontdesk-6.jpg', alt: 'Photo gallery frontdesk 6' },
-            { src: '/images/frontdesk/photo-gallery-frontdesk-7.jpg', alt: 'Photo gallery frontdesk 7' },
-            { src: '/images/frontdesk/photo-gallery-frontdesk-8.jpg', alt: 'Photo gallery frontdesk 8' },
-            { src: '/images/frontdesk/photo-gallery-frontdesk-9.jpg', alt: 'Photo gallery frontdesk 9' },
-            { src: '/images/frontdesk/photo-gallery-frontdesk-10.jpg', alt: 'Photo gallery frontdesk 10' },
-            { src: '/images/frontdesk/photo-gallery-frontdesk-11.jpg', alt: 'Photo gallery frontdesk 11' },
+        id: 'the-resort',
+        title: 'The Resort',
+        categories: [
+            {
+                id: 'frontdesk',
+                title: 'Lobby & Reception',
+                description: 'Professional reception and concierge service',
+                images: [
+                    { src: '/images/frontdesk/photo-gallery-frontdesk-1.jpg', alt: 'Front desk lobby seating' },
+                    { src: '/images/frontdesk/photo-gallery-frontdesk-2.jpg', alt: 'Reception concierge counter' },
+                    { src: '/images/frontdesk/photo-gallery-frontdesk-3.jpg', alt: 'Lobby lounge area' },
+                    { src: '/images/frontdesk/photo-gallery-frontdesk-4.jpg', alt: 'Front desk information board' },
+                    { src: '/images/frontdesk/photo-gallery-frontdesk-5.jpg', alt: 'Resort entrance and reception' },
+                    { src: '/images/frontdesk/photo-gallery-frontdesk-6.jpg', alt: 'Front desk service area' },
+                    { src: '/images/frontdesk/photo-gallery-frontdesk-7.jpg', alt: 'Resort welcome signage' },
+                ],
+            },
+            {
+                id: 'lounge',
+                title: 'Lounge',
+                description: 'Relax and unwind in style',
+                images: [
+                    { src: '/images/lounge/photo-gallery-lounge-1.jpg', alt: 'Resort lounge seating area' },
+                    { src: '/images/lounge/photo-gallery-lounge-2.jpg', alt: 'Lounge relaxation space' },
+                    { src: '/images/lounge/photo-gallery-lounge-3.jpg', alt: 'Lounge ambient lighting and seating' },
+                    { src: '/images/lounge/photo-gallery-lounge-4.jpg', alt: 'Lounge panoramic view' },
+                    { src: '/images/lounge/photo-gallery-lounge-5.jpg', alt: 'Lounge evening atmosphere' },
+                ],
+            },
+            {
+                id: 'pool',
+                title: 'Pool',
+                description: 'Multiple pools for your enjoyment',
+                images: [
+                    { src: '/images/pool/photo-gallery-pool-1.jpg', alt: 'Resort main swimming pool' },
+                    { src: '/images/pool/photo-gallery-pool-2.jpg', alt: 'Pool lounge chairs and cabana' },
+                    { src: '/images/pool/photo-gallery-pool-3.jpg', alt: 'Infinity pool with ocean view' },
+                    { src: '/images/pool/photo-gallery-pool-4.jpg', alt: 'Pool area with tropical landscaping' },
+                    { src: '/images/pool/photo-gallery-pool-5.jpg', alt: 'Evening pool with ambient lighting' },
+                    { src: '/images/pool/photo-gallery-pool-6.jpg', alt: 'Lap pool for fitness swimming' },
+                    { src: '/images/pool/photo-gallery-pool-7.jpg', alt: 'Pool deck and seating area' },
+                    { src: '/images/pool/photo-gallery-pool-8.jpg', alt: 'Kiddie pool and family area' },
+                ],
+            },
+            {
+                id: 'beach',
+                title: 'Beach',
+                description: 'Private beach access steps away',
+                images: [
+                    { src: '/images/beach/photo-gallery-beach-1.jpg', alt: 'Beach shoreline and crystal waters' },
+                    { src: '/images/beach/photo-gallery-beach-2.jpg', alt: 'Beach lounge area with umbrellas' },
+                    { src: '/images/beach/photo-gallery-beach-3.jpg', alt: 'Seaside walking path' },
+                    { src: '/images/beach/photo-gallery-beach-4.jpg', alt: 'Beach sunset panoramic view' },
+                    { src: '/images/beach/photo-gallery-beach-5.jpg', alt: 'Beach palm trees and coastline' },
+                    { src: '/images/beach/photo-gallery-beach-6.jpg', alt: 'Beachfront relaxation spot' },
+                ],
+            },
+            {
+                id: 'gym',
+                title: 'Gym',
+                description: 'State-of-the-art fitness facilities',
+                images: [
+                    { src: '/images/gym/photo-gallery-gym-1.jpg', alt: 'Fitness center main floor' },
+                    { src: '/images/gym/photo-gallery-gym-2.jpg', alt: 'Cardio equipment area' },
+                    { src: '/images/gym/photo-gallery-gym-3.jpg', alt: 'Free weights and strength area' },
+                    { src: '/images/gym/photo-gallery-gym-4.jpg', alt: 'Gym stretching and yoga space' },
+                    { src: '/images/gym/photo-gallery-gym-5.jpg', alt: 'Exercise machines row' },
+                    { src: '/images/gym/photo-gallery-gym-6.jpg', alt: 'Gym locker and towel area' },
+                    { src: '/images/gym/photo-gallery-gym-7.jpg', alt: 'Training equipment closeup' },
+                    { src: '/images/gym/photo-gallery-gym-8.jpg', alt: 'Gym panoramic view' },
+                ],
+            },
         ],
     },
 ]
+
+// Flatten all categories for state initialization
+const allCategories = galleryGroups.flatMap((group) => group.categories)
 
 // Premium Icon Component - Elegant outlined design with gradient glow
 const PremiumIcon = ({
@@ -286,12 +315,14 @@ const PremiumIcon = ({
 }
 
 export default function ExperienceSection() {
-    const [activeCategory, setActiveCategory] = useState(galleryCategories[0].id)
+    const [activeGroupId, setActiveGroupId] = useState(galleryGroups[0].id)
+    const [activeCategory, setActiveCategory] = useState(galleryGroups[0].categories[0].id)
     const [currentImageIndexes, setCurrentImageIndexes] = useState<Record<string, number>>(
-        Object.fromEntries(galleryCategories.map((cat) => [cat.id, 0]))
+        Object.fromEntries(allCategories.map((cat) => [cat.id, 0]))
     )
 
-    const activeGallery = galleryCategories.find((cat) => cat.id === activeCategory) || galleryCategories[0]
+    const activeGroup = galleryGroups.find((g) => g.id === activeGroupId) || galleryGroups[0]
+    const activeGallery = activeGroup.categories.find((cat) => cat.id === activeCategory) || activeGroup.categories[0]
     const currentImageIndex = currentImageIndexes[activeCategory] || 0
 
     const handleNextImage = () => {
@@ -316,10 +347,12 @@ export default function ExperienceSection() {
         }))
     }
 
-    const handleCategoryKeyDown = (e: React.KeyboardEvent, categoryId: string) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            setActiveCategory(categoryId)
+    const handleGroupChange = (groupId: string) => {
+        if (groupId === activeGroupId) return
+        setActiveGroupId(groupId)
+        const group = galleryGroups.find((g) => g.id === groupId)
+        if (group) {
+            setActiveCategory(group.categories[0].id)
         }
     }
 
@@ -741,22 +774,44 @@ export default function ExperienceSection() {
                         </div>
                     </BlurFade>
 
-                    {/* Category Pills */}
+                    {/* Group Tabs */}
                     <BlurFade delay={BASE_DELAY + STAGGER_DELAY} inView>
-                        <div className="flex flex-wrap justify-center gap-3 mb-10" role="tablist" aria-label="Gallery categories">
-                            {galleryCategories.map((category) => (
+                        <div className="flex justify-center mb-6">
+                            <div className="inline-flex rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 p-1.5" role="tablist" aria-label="Gallery groups">
+                                {galleryGroups.map((group) => (
+                                    <button
+                                        key={group.id}
+                                        onClick={() => handleGroupChange(group.id)}
+                                        role="tab"
+                                        aria-selected={activeGroupId === group.id}
+                                        className={cn(
+                                            "px-6 py-2.5 md:px-8 md:py-3 rounded-xl font-semibold text-sm md:text-base transition-all duration-300",
+                                            activeGroupId === group.id
+                                                ? "bg-white text-ocean-deep shadow-lg shadow-white/20"
+                                                : "text-white/70 hover:text-white hover:bg-white/10"
+                                        )}
+                                    >
+                                        {group.title}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </BlurFade>
+
+                    {/* Category Pills */}
+                    <BlurFade delay={BASE_DELAY + STAGGER_DELAY * 1.5} inView>
+                        <div className="flex flex-wrap justify-center gap-2 md:gap-3 mb-10" role="tablist" aria-label="Gallery categories">
+                            {activeGroup.categories.map((category) => (
                                 <button
                                     key={category.id}
                                     onClick={() => setActiveCategory(category.id)}
-                                    onKeyDown={(e) => handleCategoryKeyDown(e, category.id)}
                                     role="tab"
                                     aria-selected={activeCategory === category.id}
-                                    aria-controls={`gallery-panel-${category.id}`}
                                     className={cn(
-                                        "px-6 py-3 rounded-full font-semibold transition-all duration-300",
+                                        "px-5 py-2 md:px-6 md:py-2.5 rounded-full text-sm font-medium transition-all duration-300",
                                         activeCategory === category.id
-                                            ? "bg-white text-ocean-deep shadow-lg shadow-white/20"
-                                            : "bg-white/10 text-white hover:bg-white/20 border border-white/10"
+                                            ? "bg-coral text-white shadow-lg shadow-coral/30"
+                                            : "bg-white/10 text-white/80 hover:bg-white/20 border border-white/10"
                                     )}
                                 >
                                     {category.title}
@@ -815,14 +870,13 @@ export default function ExperienceSection() {
                                     </button>
 
                                     {/* Dots */}
-                                    <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex gap-2" role="tablist" aria-label="Gallery image navigation">
+                                    <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex gap-2" role="group" aria-label="Gallery image navigation">
                                         {activeGallery.images.map((_, index) => (
                                             <button
                                                 key={index}
                                                 onClick={() => handleDotClick(index)}
-                                                role="tab"
-                                                aria-selected={index === currentImageIndex}
-                                                aria-label={`View image ${index + 1}`}
+                                                aria-current={index === currentImageIndex ? 'true' : undefined}
+                                                aria-label={`Image ${index + 1} of ${activeGallery.images.length}`}
                                                 className={cn(
                                                     "h-2 rounded-full transition-all duration-300",
                                                     index === currentImageIndex

@@ -227,4 +227,13 @@
       transform: translateY(calc(-100% - var(--gap)));
     }
   }
+
+  @keyframes hero-progress {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
 }
