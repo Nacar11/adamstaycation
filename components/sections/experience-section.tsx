@@ -138,7 +138,7 @@ const safetyFeatures: string[] = [
 
 // Room specifications
 const roomSpecs: RoomSpec[] = [
-    { icon: Users, value: '2', numericValue: 2, label: 'Guests Max' },
+    { icon: Users, value: '3', numericValue: 3, label: 'Guests Max' },
     { icon: BedDouble, value: '1', numericValue: 1, label: 'Queen Bed' },
     { icon: Maximize, value: '35', numericValue: 35, label: 'sqm Space' },
 ]
@@ -259,12 +259,10 @@ const galleryGroups: GalleryGroup[] = [
                 images: [
                     { src: '/images/gym/photo-gallery-gym-1.jpg', alt: 'Fitness center main floor' },
                     { src: '/images/gym/photo-gallery-gym-2.jpg', alt: 'Cardio equipment area' },
-                    { src: '/images/gym/photo-gallery-gym-3.jpg', alt: 'Free weights and strength area' },
                     { src: '/images/gym/photo-gallery-gym-4.jpg', alt: 'Gym stretching and yoga space' },
                     { src: '/images/gym/photo-gallery-gym-5.jpg', alt: 'Exercise machines row' },
                     { src: '/images/gym/photo-gallery-gym-6.jpg', alt: 'Gym locker and towel area' },
                     { src: '/images/gym/photo-gallery-gym-7.jpg', alt: 'Training equipment closeup' },
-                    { src: '/images/gym/photo-gallery-gym-8.jpg', alt: 'Gym panoramic view' },
                 ],
             },
         ],
@@ -545,7 +543,7 @@ export default function ExperienceSection() {
                                             <div className="pb-5">
                                                 <h4 className="font-semibold text-ocean-deep mb-1">Check In at the Lobby</h4>
                                                 <p className="text-ocean/70 text-sm leading-relaxed">
-                                                    Proceed to the front desk and sign in the log book. The staff
+                                                    Proceed to the front desk and sign in the log book. The host
                                                     will verify your reservation details.
                                                 </p>
                                             </div>
