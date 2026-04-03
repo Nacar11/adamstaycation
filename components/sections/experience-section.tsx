@@ -177,7 +177,21 @@ const galleryCategories: GalleryCategory[] = [
             { src: '/images/pool/photo-gallery-pool-5.jpg', alt: 'Photo gallery pool 5' },
             { src: '/images/pool/photo-gallery-pool-6.jpg', alt: 'Photo gallery pool 6' },
             { src: '/images/pool/photo-gallery-pool-7.jpg', alt: 'Photo gallery pool 7' },
-            { src: '/images/pool/photo-gallery-pool-8.jpg', alt: 'Photo gallery pool 8' },
+        ],
+    },
+    {
+        id: 'beach',
+        title: 'Beach',
+        description: 'Beautiful beachfront access',
+        images: [
+            { src: '/images/beach/photo-gallery-beach-1.jpg', alt: 'Photo gallery beach 1' },
+            { src: '/images/beach/photo-gallery-beach-2.jpg', alt: 'Photo gallery beach 2' },
+            { src: '/images/beach/photo-gallery-beach-3.jpg', alt: 'Photo gallery beach 3' },
+            { src: '/images/beach/photo-gallery-beach-4.jpg', alt: 'Photo gallery beach 4' },
+            { src: '/images/beach/photo-gallery-beach-5.jpg', alt: 'Photo gallery beach 5' },
+            { src: '/images/beach/photo-gallery-beach-6.jpg', alt: 'Photo gallery beach 6' },
+            { src: '/images/beach/photo-gallery-beach-7.jpg', alt: 'Photo gallery beach 7' },
+            { src: '/images/beach/photo-gallery-beach-8.jpg', alt: 'Photo gallery beach 8' },
         ],
     },
     {
