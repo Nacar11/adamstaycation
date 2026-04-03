@@ -83,7 +83,7 @@ export default function HostSection() {
                                     />
                                     <div className="absolute inset-0 rounded-full overflow-hidden z-10 bg-white m-[3px]">
                                         <Image
-                                            src="/images/owner.jpg"
+                                            src="/images/studio/owner.jpg"
                                             alt="Dale Nacario - Property Owner"
                                             width={224}
                                             height={224}
@@ -106,7 +106,7 @@ export default function HostSection() {
 
                                 <BlurFade delay={BASE_DELAY + STAGGER_DELAY * 3} inView>
                                     <p className="text-lg text-ocean mb-4 font-medium">
-                                        Property Owner & Developer
+                                        Property Owner
                                     </p>
                                 </BlurFade>
 
