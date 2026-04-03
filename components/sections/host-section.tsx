@@ -14,22 +14,23 @@ const BASE_DELAY = 0.2
 
 // Contact information for business cards
 const contactInfo = [
-    { 
-        icon: Mail, 
-        label: 'Email', 
+    {
+        icon: Mail,
+        image: '/images/host/gmail.jpeg',
+        label: 'Email',
         value: 'nacariodale@gmail.com',
         href: 'mailto:nacariodale@gmail.com'
     },
-    { 
-        icon: Phone, 
-        label: 'Phone', 
+    {
+        icon: Phone,
+        label: 'Phone',
         value: '0926-003-2484',
         href: 'tel:09260032484'
     },
-    { 
-        icon: MapPin, 
-        label: 'Location', 
-        value: 'Tambuli Seaside Resort and Spa',
+    {
+        icon: MapPin,
+        label: 'Location',
+        value: 'Buyong Road, Maribago, Lapu-lapu City, 6015, Central Visayas, Philippines',
         href: 'https://www.google.com/maps/place/Tambuli+Seaside+Resort+and+Spa/@10.2899858,124.0020002,17z/data=!3m1!4b1!4m9!3m8!1s0x33a99732246dcbc5:0x61ef43a187a2080a!5m2!4m1!1i2!8m2!3d10.2899858!4d124.0068711!16s%2Fg%2F11h_3t257r?entry=ttu&g_ep=EgoyMDI2MDMxNy4wIKXMDSoASAFQAw%3D%3D'
     },
 ]
@@ -170,7 +171,7 @@ export default function HostSection() {
                             return (
                                 <BlurFade key={contact.label} delay={BASE_DELAY + STAGGER_DELAY * (8 + index)} inView>
                                     <MagicCard
-                                        className="text-center p-6 rounded-2xl bg-white border border-sand-dark/10 hover:shadow-lg transition-all duration-300"
+                                        className="text-center p-6 rounded-2xl bg-white border border-sand-dark/10 hover:shadow-lg transition-all duration-300 h-full"
                                         gradientColor="rgba(30, 77, 92, 0.08)"
                                         gradientSize={150}
                                     >
@@ -180,11 +181,15 @@ export default function HostSection() {
                                             aria-label={`Contact via ${contact.label}`}
                                         >
                                             <div className="flex justify-center mb-4">
-                                                <div className="p-3 rounded-full bg-ocean-light group-hover:bg-ocean transition-colors duration-300">
-                                                    <Icon className="w-6 h-6 text-ocean group-hover:text-white transition-colors duration-300" aria-hidden="true" />
+                                                <div className="p-3 rounded-full bg-ocean-light">
+                                                    {contact.image ? (
+                                                        <img src={contact.image} alt={contact.label} className="w-6 h-6 object-contain" />
+                                                    ) : (
+                                                        <Icon className="w-6 h-6 text-ocean" aria-hidden="true" />
+                                                    )}
                                                 </div>
                                             </div>
-                                            <h3 className="font-semibold text-ocean-deep mb-2 group-hover:text-coral transition-colors duration-300">
+                                            <h3 className="font-semibold text-ocean-deep mb-2">
                                                 {contact.label}
                                             </h3>
                                             <p className="text-ocean/80 text-sm leading-relaxed">

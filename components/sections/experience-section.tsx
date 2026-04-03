@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import {
     Waves,
@@ -83,25 +83,32 @@ interface GalleryGroup {
 // Featured highlights - the "wow" factors with premium styling
 const featuredHighlights: FeaturedHighlight[] = [
     {
-        image: '/images/experience/pool-beach-access.png',
+        image: '/images/experience/pool-beach-access.jpg',
         title: 'Pool & Beach Access',
         description: 'Multiple resort pools and private beach',
         accentColor: '#1E4D5C',
         glowColor: 'rgba(30, 77, 92, 0.4)'
     },
     {
-        image: '/images/experience/luxury-amenities.png',
+        image: '/images/experience/luxury-amneties.jpg',
         title: 'Luxury Amenities',
         description: 'Fully equipped modern studio',
         accentColor: '#E07A5F',
         glowColor: 'rgba(224, 122, 95, 0.4)'
     },
     {
-        image: '/images/experience/resort-living.png',
+        image: '/images/experience/resort-living.jpg',
         title: 'Resort Living',
         description: '11-hectare seaside community',
         accentColor: '#1E4D5C',
         glowColor: 'rgba(30, 77, 92, 0.4)'
+    },
+    {
+        image: '/images/experience/gym-access.jpg',
+        title: 'Gym & Fitness',
+        description: 'State-of-the-art fitness facilities',
+        accentColor: '#E07A5F',
+        glowColor: 'rgba(224, 122, 95, 0.4)'
     }
 ]
 
@@ -230,7 +237,6 @@ const galleryGroups: GalleryGroup[] = [
                     { src: '/images/pool/photo-gallery-pool-5.jpg', alt: 'Evening pool with ambient lighting' },
                     { src: '/images/pool/photo-gallery-pool-6.jpg', alt: 'Lap pool for fitness swimming' },
                     { src: '/images/pool/photo-gallery-pool-7.jpg', alt: 'Pool deck and seating area' },
-                    { src: '/images/pool/photo-gallery-pool-8.jpg', alt: 'Kiddie pool and family area' },
                 ],
             },
             {
@@ -314,7 +320,26 @@ const PremiumIcon = ({
     )
 }
 
+const aboutCarouselImages = [
+    '/images/about/about-kitchen.jpg',
+    '/images/studio/photo-gallery-studio-1.jpg',
+    '/images/studio/photo-gallery-studio-2.jpg',
+    '/images/balcony/photo-gallery-balcony-1.jpg',
+]
+
 export default function ExperienceSection() {
+    // About section carousel
+    const [aboutIndex, setAboutIndex] = useState(0)
+
+    const advanceAbout = useCallback(() => {
+        setAboutIndex((prev) => (prev + 1) % aboutCarouselImages.length)
+    }, [])
+
+    useEffect(() => {
+        const interval = setInterval(advanceAbout, 5000)
+        return () => clearInterval(interval)
+    }, [advanceAbout])
+
     const [activeGroupId, setActiveGroupId] = useState(galleryGroups[0].id)
     const [activeCategory, setActiveCategory] = useState(galleryGroups[0].categories[0].id)
     const [currentImageIndexes, setCurrentImageIndexes] = useState<Record<string, number>>(
@@ -353,6 +378,21 @@ export default function ExperienceSection() {
         const group = galleryGroups.find((g) => g.id === groupId)
         if (group) {
             setActiveCategory(group.categories[0].id)
+        }
+    }
+
+    // Touch swipe for mobile gallery
+    const touchStartX = useRef(0)
+
+    const handleTouchStart = (e: React.TouchEvent) => {
+        touchStartX.current = e.touches[0].clientX
+    }
+
+    const handleTouchEnd = (e: React.TouchEvent) => {
+        const deltaX = e.changedTouches[0].clientX - touchStartX.current
+        if (Math.abs(deltaX) > 50) {
+            if (deltaX < 0) handleNextImage()
+            else handlePrevImage()
         }
     }
 
@@ -408,7 +448,7 @@ export default function ExperienceSection() {
                     </BlurFade>
 
                     {/* Featured Highlights - Premium Design */}
-                    <div className="grid md:grid-cols-3 gap-6 mt-16">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-16">
                         {featuredHighlights.map((highlight, index) => (
                             <BlurFade key={highlight.title} delay={BASE_DELAY + STAGGER_DELAY * (index + 2)} inView>
                                 <MagicCard
@@ -458,64 +498,121 @@ export default function ExperienceSection() {
                             <div className="grid lg:grid-cols-2">
                                 {/* Left - Content */}
                                 <div className="p-10 md:p-14 lg:p-16">
-                                    <span className="inline-flex items-center gap-2 px-4 py-2 bg-ocean-light rounded-full text-ocean text-sm font-medium mb-6">
-                                        <Star className="w-4 h-4 fill-current" aria-hidden="true" />
-                                        About This Space
-                                    </span>
-                                    <h3 className="font-display text-3xl md:text-4xl text-ocean-deep mb-6">
-                                        Mabuhay! Welcome to Adam&apos;s Staycation
-                                    </h3>
-                                    <p className="text-ocean/80 text-lg leading-relaxed mb-8">
-                                        Experience luxury living at Tambuli Seaside Living — a premier
-                                        residential resort community in Lapu-Lapu City, Cebu. Our fully-furnished
-                                        one-bedroom studio offers the perfect blend of comfort and resort-style amenities.
+                                    {/* Eyebrow Label */}
+                                    <p className="text-ocean/50 text-xs uppercase tracking-wider font-medium mb-4">
+                                        Your Stay
                                     </p>
 
-                                    {/* Self Check-in Badge */}
-                                    <MagicCard
-                                        className="p-6 bg-gradient-to-br from-ocean-light to-sand-light rounded-2xl border border-ocean/10"
-                                        gradientColor="rgba(30, 77, 92, 0.1)"
-                                    >
-                                        <div className="flex items-start gap-4">
-                                            <div className="w-12 h-12 rounded-xl bg-ocean flex items-center justify-center flex-shrink-0 shadow-lg">
-                                                <Check className="w-6 h-6 text-white" aria-hidden="true" />
+                                    {/* Heading with coral accent bar */}
+                                    <h3 className="font-display text-3xl md:text-4xl text-ocean-deep mb-6 border-l-4 border-coral pl-4">
+                                        Welcome to Adam&apos;s Staycation
+                                    </h3>
+
+                                    {/* Description callout */}
+                                    <div className="bg-ocean-light/40 rounded-xl p-5 mb-8">
+                                        <p className="text-ocean/80 text-base leading-relaxed">
+                                            Your staycation is located at the <strong className="text-ocean-deep">Dita Building</strong> of
+                                            Tambuli Seaside Living in Lapu-Lapu City, Cebu. A fully-furnished studio
+                                            with resort-style amenities awaits you — here&apos;s how to get settled in.
+                                        </p>
+                                    </div>
+
+                                    {/* Check-in Steps */}
+                                    <div className="bg-sand/40 rounded-2xl p-6 space-y-5">
+                                        <div className="flex gap-4">
+                                            <div className="flex flex-col items-center">
+                                                <div className="w-9 h-9 rounded-full bg-coral flex items-center justify-center text-white text-sm font-bold flex-shrink-0 shadow-md">
+                                                    1
+                                                </div>
+                                                <div className="w-px flex-1 bg-sand-dark/30 mt-2" />
                                             </div>
-                                            <div>
-                                                <h4 className="font-semibold text-ocean-deep mb-1">Self Check-in</h4>
-                                                <p className="text-ocean/70 text-sm">
-                                                    After signing the log book, proceed directly to the room — it&apos;s open and ready for you!
+                                            <div className="pb-5">
+                                                <h4 className="font-semibold text-ocean-deep mb-1">Arrive at Tambuli</h4>
+                                                <p className="text-ocean/70 text-sm leading-relaxed">
+                                                    Head to the Dita Building entrance. Let the security guard know
+                                                    you&apos;re a booked guest for your scheduled stay.
                                                 </p>
                                             </div>
                                         </div>
-                                    </MagicCard>
+
+                                        <div className="flex gap-4">
+                                            <div className="flex flex-col items-center">
+                                                <div className="w-9 h-9 rounded-full bg-coral flex items-center justify-center text-white text-sm font-bold flex-shrink-0 shadow-md">
+                                                    2
+                                                </div>
+                                                <div className="w-px flex-1 bg-sand-dark/30 mt-2" />
+                                            </div>
+                                            <div className="pb-5">
+                                                <h4 className="font-semibold text-ocean-deep mb-1">Check In at the Lobby</h4>
+                                                <p className="text-ocean/70 text-sm leading-relaxed">
+                                                    Proceed to the front desk and sign in the log book. The staff
+                                                    will verify your reservation details.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex gap-4">
+                                            <div className="flex flex-col items-center">
+                                                <div className="w-9 h-9 rounded-full bg-ocean flex items-center justify-center flex-shrink-0 shadow-md">
+                                                    <Check className="w-5 h-5 text-white" aria-hidden="true" />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h4 className="font-semibold text-ocean-deep mb-1">Settle Into Your Suite</h4>
+                                                <p className="text-ocean/70 text-sm leading-relaxed">
+                                                    Head up to your fully-furnished studio — it&apos;s open and
+                                                    ready for you. Make yourself at home!
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                {/* Right - Room Specs with Number Ticker */}
-                                <div className="bg-gradient-to-br from-ocean-deep to-ocean p-10 md:p-14 lg:p-16 flex flex-col justify-center">
-                                    <h4 className="text-white/60 text-sm uppercase tracking-wider mb-8 font-medium">
-                                        Room Specifications
-                                    </h4>
-                                    <div className="space-y-6">
-                                        {roomSpecs.map((spec) => {
-                                            const Icon = spec.icon
-                                            return (
-                                                <div key={spec.label} className="flex items-center gap-5">
-                                                    <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/10">
-                                                        <Icon className="w-7 h-7 text-white" aria-hidden="true" />
-                                                    </div>
-                                                    <div>
-                                                        <span className="text-4xl font-display text-white font-bold">
+                                {/* Right - Sliding Carousel + Room Specs */}
+                                <div className="flex flex-col">
+                                    {/* Image Carousel — 4/5 of right panel */}
+                                    <div className="relative flex-[4] min-h-[280px] lg:min-h-0 overflow-hidden">
+                                        <div
+                                            className="flex h-full transition-transform duration-700 ease-out"
+                                            style={{ transform: `translateX(-${aboutIndex * 100}%)` }}
+                                        >
+                                            {aboutCarouselImages.map((src, index) => (
+                                                <img
+                                                    key={src}
+                                                    src={src}
+                                                    alt=""
+                                                    className="w-full h-full object-cover flex-shrink-0"
+                                                />
+                                            ))}
+                                        </div>
+                                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-ocean-deep/60 pointer-events-none" />
+                                    </div>
+
+                                    {/* Room Specs — 1/3 of right panel */}
+                                    <div className="bg-gradient-to-br from-ocean-deep to-ocean px-8 py-6 md:px-12 md:py-8 lg:px-14 lg:py-8 flex-1 flex flex-col justify-center">
+                                        <h4 className="text-white/60 text-xs uppercase tracking-wider mb-4 font-medium">
+                                            Room Specifications
+                                        </h4>
+                                        <div className="grid grid-cols-3 gap-3">
+                                            {roomSpecs.map((spec) => {
+                                                const Icon = spec.icon
+                                                return (
+                                                    <div key={spec.label} className="text-center">
+                                                        <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/10 mx-auto mb-2">
+                                                            <Icon className="w-5 h-5 text-white" aria-hidden="true" />
+                                                        </div>
+                                                        <span className="text-2xl font-display text-white font-bold block">
                                                             {spec.numericValue ? (
                                                                 <NumberTicker value={spec.numericValue} className="text-white" />
                                                             ) : (
                                                                 spec.value
                                                             )}
                                                         </span>
-                                                        <p className="text-white/60 text-sm font-medium">{spec.label}</p>
+                                                        <p className="text-white/50 text-xs font-medium mt-0.5">{spec.label}</p>
                                                     </div>
-                                                </div>
-                                            )
-                                        })}
+                                                )
+                                            })}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -707,7 +804,7 @@ export default function ExperienceSection() {
                                     </div>
                                     <h4 className="text-3xl md:text-4xl font-display mb-4 font-bold">Extended Stay Promo</h4>
                                     <p className="text-white/95 text-lg mb-8 max-w-md leading-relaxed">
-                                        Book for a <strong className="text-white font-bold">minimum of 3 weeks</strong> and enjoy <strong className="text-white font-bold">FREE access</strong> to all resort amenities!
+                                        Book for a <strong className="text-white font-bold">minimum of 3 weeks</strong> (negotiable) and enjoy <strong className="text-white font-bold">FREE access</strong> to all resort amenities!
                                     </p>
                                     <div className="flex items-center gap-3 p-4 bg-white/15 backdrop-blur-sm rounded-xl border border-white/20">
                                         <Calendar className="w-6 h-6 flex-shrink-0" aria-hidden="true" />
@@ -828,7 +925,11 @@ export default function ExperienceSection() {
                             id={`gallery-panel-${activeCategory}`}
                             aria-label={`${activeGallery.title} gallery`}
                         >
-                            <div className="aspect-[16/9] relative bg-ocean">
+                            <div
+                                className="aspect-[3/4] md:aspect-[16/9] relative bg-ocean"
+                                onTouchStart={handleTouchStart}
+                                onTouchEnd={handleTouchEnd}
+                            >
                                 <img
                                     key={`${activeCategory}-${currentImageIndex}`}
                                     src={activeGallery.images[currentImageIndex].src}
@@ -843,9 +944,9 @@ export default function ExperienceSection() {
                                 <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between">
                                     <div>
                                         <h4 className="text-white font-semibold text-lg mb-1">{activeGallery.title}</h4>
-                                        <p className="text-white/80 text-sm">{activeGallery.description}</p>
+                                        <p className="text-white/80 text-sm hidden md:block">{activeGallery.description}</p>
                                     </div>
-                                    <div className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium border border-white/10">
+                                    <div className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium border border-white/10 hidden md:block">
                                         {currentImageIndex + 1} / {activeGallery.images.length}
                                     </div>
                                 </div>
@@ -856,14 +957,14 @@ export default function ExperienceSection() {
                                 <>
                                     <button
                                         onClick={handlePrevImage}
-                                        className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center text-ocean-deep opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white hover:scale-110 shadow-xl focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-white"
+                                        className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/95 backdrop-blur-sm items-center justify-center text-ocean-deep opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white hover:scale-110 shadow-xl focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-white hidden md:flex"
                                         aria-label="Previous image"
                                     >
                                         <ChevronLeft className="w-6 h-6" />
                                     </button>
                                     <button
                                         onClick={handleNextImage}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center text-ocean-deep opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white hover:scale-110 shadow-xl focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-white"
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/95 backdrop-blur-sm items-center justify-center text-ocean-deep opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white hover:scale-110 shadow-xl focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-white hidden md:flex"
                                         aria-label="Next image"
                                     >
                                         <ChevronRight className="w-6 h-6" />

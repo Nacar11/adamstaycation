@@ -15,10 +15,9 @@ const BASE_DELAY = 0.2
 const SLIDE_DURATION = 7000
 
 const heroImages = [
-    { src: '/images/banner/landing-page-1.jpg', origin: '30% 60%' },
-    { src: '/images/banner/landing-page-2.jpg', origin: '70% 40%' },
-    { src: '/images/banner/landing-page-3.jpg', origin: '50% 30%' },
-    { src: '/images/banner/landing-page-4.jpg', origin: '40% 70%' },
+    { src: '/images/banner/landing-page-1.jpg', origin: '70% 40%' },
+    { src: '/images/banner/landing-page-2.jpg', origin: '50% 30%' },
+    { src: '/images/banner/landing-page-3.jpg', origin: '40% 70%' },
 ]
 
 export default function LandingSection() {
@@ -114,7 +113,7 @@ export default function LandingSection() {
                     <TextAnimate
                         animation="blurInUp"
                         by="character"
-                        className="font-display text-5xl md:text-7xl lg:text-8xl text-white mb-6 tracking-tight"
+                        className="font-display text-[2.6rem] md:text-7xl lg:text-8xl text-white mb-6 tracking-tight whitespace-nowrap"
                         style={{ textShadow: '2px 4px 8px rgba(0,0,0,0.3)' }}
                     >
                         Adam&apos;s Staycation
