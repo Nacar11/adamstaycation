@@ -7,7 +7,7 @@
  * Official Airbnb listing URL for Adam's Staycation
  * @see https://www.airbnb.com/rooms/1231044487009153160
  */
-export const AIRBNB_LISTING_URL = 'https://www.airbnb.com/rooms/1231044487009153160?unique_share_id=ad4b4703-125f-4ce8-a5ea-1bf3dbb4adc7&viralityEntryPoint=1&s=76'
+export const AIRBNB_LISTING_URL = 'https://www.airbnb.com/h/adamsstaycation'
 
 /**
  * Contact email for property inquiries
