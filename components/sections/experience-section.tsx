@@ -321,7 +321,8 @@ const PremiumIcon = ({
 const aboutCarouselImages = [
     '/images/about/about-kitchen.jpg',
     '/images/studio/photo-gallery-studio-1.jpg',
-    '/images/studio/photo-gallery-studio-2.jpg',
+    '/images/studio/photo-gallery-studio-4.jpg',
+    '/images/kitchen/photo-gallery-kitchen-1.jpg',
     '/images/balcony/photo-gallery-balcony-1.jpg',
 ]
 
