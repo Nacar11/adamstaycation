@@ -10,7 +10,7 @@ const EssentialsStrip = () => (
 
             {/* — Section label — */}
             <div className="pt-8 pb-5 text-center">
-                <span className="text-[10px] uppercase tracking-[0.35em] text-ocean/30 font-medium">Everything Included</span>
+                <span className="text-[10px] uppercase tracking-[0.35em] text-ocean/75 font-medium">Everything Included</span>
             </div>
 
             {/* — Amenities scrollable row — */}
@@ -35,7 +35,7 @@ const EssentialsStrip = () => (
                                     className="flex-shrink-0 flex items-center gap-2 mx-2 px-4 py-2 rounded-full bg-sand-light border border-sand-dark/20 hover:bg-sand hover:border-sand-dark/35 transition-all duration-200 cursor-default"
                                 >
                                     <Icon className="w-3.5 h-3.5 flex-shrink-0 text-coral/70" strokeWidth={1.5} aria-hidden="true" />
-                                    <span className="text-xs font-medium tracking-wide whitespace-nowrap text-ocean/70">{amenity.title}</span>
+                                    <span className="text-xs font-medium tracking-wide whitespace-nowrap text-ocean/80">{amenity.title}</span>
                                 </div>
                             )
                         })}
@@ -47,11 +47,11 @@ const EssentialsStrip = () => (
             <div className="border-t border-sand-dark/10 py-4 px-5 md:px-10">
                 <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
                     <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <Shield className="w-3.5 h-3.5 text-ocean/35" strokeWidth={1.5} aria-hidden="true" />
-                        <span className="text-[10px] uppercase tracking-[0.25em] text-ocean/30 font-medium">Safety</span>
+                        <Shield className="w-3.5 h-3.5 text-ocean/75" strokeWidth={1.5} aria-hidden="true" />
+                        <span className="text-[10px] uppercase tracking-[0.25em] text-ocean/75 font-medium">Safety</span>
                     </div>
                     {safetyFeatures.map((feature, i) => (
-                        <span key={feature} className="text-[11px] text-ocean/40 whitespace-nowrap">
+                        <span key={feature} className="text-[11px] text-ocean/75 whitespace-nowrap">
                             {feature}{i < safetyFeatures.length - 1 && (
                                 <span className="ml-6 text-ocean/20" aria-hidden="true">·</span>
                             )}

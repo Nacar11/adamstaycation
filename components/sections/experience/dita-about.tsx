@@ -56,7 +56,7 @@ const DitaAbout = () => {
                                             <div className="w-1.5 h-1.5 rounded-full bg-rust mt-[10px] flex-shrink-0" aria-hidden="true" />
                                             <p className="text-base leading-[1.7]">
                                                 <span className="text-ocean-deep font-semibold">{item.highlight} </span>
-                                                <span className="text-ocean/75">{item.detail}</span>
+                                                <span className="text-ocean/80">{item.detail}</span>
                                             </p>
                                         </div>
                                     ))}
@@ -74,7 +74,7 @@ const DitaAbout = () => {
                                             <h3 className="font-display text-ocean-deep text-xl mb-2">
                                                 {item.title}
                                             </h3>
-                                            <p className="text-ocean/75 text-[15px] leading-relaxed max-w-sm">
+                                            <p className="text-ocean/80 text-[15px] leading-relaxed max-w-sm">
                                                 {item.body}
                                             </p>
                                         </div>
@@ -106,7 +106,7 @@ const DitaAbout = () => {
 
                             {/* Room specs — dark gradient overlay */}
                             <div className="absolute bottom-0 left-0 right-0 pt-20 pb-8 px-8 md:px-10 bg-gradient-to-t from-ocean-deep/95 via-ocean-deep/60 to-transparent pointer-events-none">
-                                <p className="text-white/25 text-[9px] uppercase tracking-[0.35em] mb-5">
+                                <p className="text-white/55 text-[9px] uppercase tracking-[0.35em] mb-5">
                                     Room Specifications
                                 </p>
                                 <div className="flex items-center gap-8 md:gap-10">
@@ -121,7 +121,7 @@ const DitaAbout = () => {
                                                             <NumberTicker value={spec.numericValue} className="text-white" />
                                                         ) : spec.value}
                                                     </p>
-                                                    <p className="text-white/35 text-[11px] mt-0.5 tracking-wide">{spec.label}</p>
+                                                    <p className="text-white/55 text-[11px] mt-0.5 tracking-wide">{spec.label}</p>
                                                 </div>
                                             </div>
                                         )

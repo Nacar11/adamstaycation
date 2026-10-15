@@ -179,7 +179,7 @@ const PhotoGallery = () => {
                                             "px-5 py-2.5 min-h-[44px] flex items-center rounded-lg text-sm font-semibold transition-all duration-250 cursor-pointer",
                                             activeGroupId === group.id
                                                 ? "bg-ocean-deep text-white shadow-md"
-                                                : "text-ocean/50 hover:text-ocean"
+                                                : "text-ocean/75 hover:text-ocean"
                                         )}
                                     >
                                         {group.title}
@@ -215,8 +215,8 @@ const PhotoGallery = () => {
                                     className={cn(
                                         "px-4 py-2.5 min-h-[44px] flex items-center rounded-full text-xs font-medium cursor-pointer transition-colors duration-200",
                                         activeCategory === category.id
-                                            ? "bg-coral text-white shadow-sm shadow-coral/20"
-                                            : "bg-white text-ocean/50 hover:text-ocean border border-sand-dark/15 hover:border-sand-dark/30"
+                                            ? "bg-rust text-white shadow-sm shadow-rust/20"
+                                            : "bg-white text-ocean/75 hover:text-ocean border border-sand-dark/15 hover:border-sand-dark/30"
                                     )}
                                 >
                                     {category.title}

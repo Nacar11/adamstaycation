@@ -168,8 +168,8 @@ const ResortAccess = () => {
                                     <p className="font-display text-[2.5rem] text-ocean-deep leading-none mb-2 tabular-nums">
                                         &#8369;900
                                     </p>
-                                    <p className="text-sm text-ocean/75 mb-5">per person / per day</p>
-                                    <p className="text-sm text-ocean/75 leading-relaxed pt-5 border-t border-sand-dark/50">
+                                    <p className="text-sm text-ocean/80 mb-5">per person / per day</p>
+                                    <p className="text-sm text-ocean/80 leading-relaxed pt-5 border-t border-sand-dark/50">
                                         Vouchers available at check-in. Ideal for 1–7 day bookings.
                                     </p>
                                 </div>

@@ -170,7 +170,7 @@ export default function HostSection() {
                     <span className="font-display text-xl text-ocean-deep">
                         Adam&apos;s Staycation
                     </span>
-                    <p className="text-ocean/50 text-sm">
+                    <p className="text-ocean/80 text-sm">
                         © {new Date().getFullYear()} All rights reserved.
                     </p>
                 </div>
