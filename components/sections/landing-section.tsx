@@ -3,7 +3,6 @@
 import { Fragment, useState, useEffect, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import { ChevronDown, MapPin, Pause, Play } from 'lucide-react'
-import { AIRBNB_LISTING_URL } from '@/lib/constants'
 import { TextAnimate } from '@/components/ui/text-animate'
 import { ShimmerButton } from '@/components/ui/shimmer-button'
 import { DotPattern } from '@/components/ui/dot-pattern'
@@ -11,21 +10,20 @@ import { Particles } from '@/components/ui/particles'
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion'
 import { useIsActive } from '@/lib/hooks/use-is-active'
 import PageLoader from '@/components/shared/page-loader'
+import AirbnbLink from '@/components/shared/airbnb-link'
 import { scrollToTarget } from '@/lib/scroll'
 import { CTA_GRADIENT, CTA_SHIMMER } from '@/lib/theme'
 import heroImage1 from '@/public/images/banner/landing-page-1.jpg'
 import heroImage2 from '@/public/images/banner/landing-page-2.jpg'
 import heroImage3 from '@/public/images/banner/landing-page-3.jpg'
 
-// Hero reveals use the CSS `animate-blur-fade-in` (paints from HTML, no JS) with the standard
-// stagger: 240 / 340 / 440 / 540 / 740 ms — same timing BlurFade would give (0.2s base + 0.1s steps + 0.04s)
+// Hero reveals use CSS animate-blur-fade-in (paints without JS) at BlurFade's stagger: 240/340/440/540/740ms
 const SLIDE_DURATION = 7000
-// Only show the branded loader if the first hero photo is still missing after this — cached/fast loads never see it
+// Loader only appears if the first photo is still missing after this, and never stays past the timeout
 const LOADER_DELAY = 400
-// Never hold the page hostage on a slow network — hide the loader after this regardless
 const LOADER_TIMEOUT = 10000
 
-// Static imports give next/image a built-in blurred preview (placeholder="blur")
+// Static imports give next/image a blurred placeholder
 const heroImages = [
     { image: heroImage1, origin: '70% 40%' },
     { image: heroImage2, origin: '50% 30%' },
@@ -77,15 +75,12 @@ const LandingSection = () => {
         setCurrentImageIndex((prev) => (prev + 1) % heroImages.length)
     }, [])
 
-    // Start the slideshow only once every slide is ready, so it never crossfades into a blurry placeholder.
-    // Reduced motion: hold on the first photo (no autoplay, no Ken Burns zoom, no particles).
+    // Autoplay needs every slide loaded and motion allowed; it also pauses on demand (WCAG 2.2.2) and when unseen
     const prefersReducedMotion = usePrefersReducedMotion()
     const canAutoplay = areAllImagesSettled && !prefersReducedMotion
 
-    // WCAG 2.2.2: visitors can pause the auto-advancing slideshow
     const [isPaused, setIsPaused] = useState(false)
 
-    // Off-screen or hidden tab: stop the slideshow timer and the particles loop
     const heroRef = useRef<HTMLElement>(null)
     const isHeroActive = useIsActive(heroRef)
     const isSlideshowRunning = canAutoplay && !isPaused && isHeroActive
@@ -94,7 +89,7 @@ const LandingSection = () => {
         setIsPaused((paused) => !paused)
     }
 
-    // Each (re)start begins a fresh slide timer — `cycle` restarts the progress bar in step with it
+    // `cycle` restarts the progress bar whenever the slide timer (re)starts
     const [cycle, setCycle] = useState(0)
 
     useEffect(() => {
@@ -115,7 +110,6 @@ const LandingSection = () => {
                 className="relative min-h-svh flex items-center justify-center overflow-hidden bg-ocean-deep"
                 aria-label="Welcome to Adam's Staycation"
             >
-                {/* Ken Burns Background Carousel */}
                 <div className="absolute inset-0" aria-hidden="true">
                     {heroImages.map((img, index) => (
                         <div
@@ -144,11 +138,9 @@ const LandingSection = () => {
                             />
                         </div>
                     ))}
-                    {/* Gradient overlay */}
                     <div className="absolute inset-0 bg-gradient-to-b from-ocean-deep/45 to-ocean-deep/75" />
                 </div>
     
-                {/* Particles Background Effect — skipped entirely for reduced motion */}
                 {!prefersReducedMotion && (
                     <Particles
                         paused={!isHeroActive}
@@ -159,16 +151,13 @@ const LandingSection = () => {
                     />
                 )}
     
-                {/* Dot Pattern Overlay */}
                 <DotPattern className="z-[2] opacity-20 [mask-image:radial-gradient(600px_circle_at_center,white,transparent)]" />
     
-                {/* Decorative Elements */}
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-sand-light/30 z-[3]" />
     
-                {/* Content — always server-rendered for SEO; re-keyed to replay entrance animations if the loader covered it */}
+                {/* Server-rendered for SEO; re-keyed to replay the entrance after the loader */}
                 <Fragment key={contentKey}>
                     <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
-                        {/* Animated Title */}
                         <div className="animate-blur-fade-in motion-reduce:animate-none [animation-delay:240ms]">
                             <TextAnimate
                                 as="h1"
@@ -180,14 +169,12 @@ const LandingSection = () => {
                             </TextAnimate>
                         </div>
         
-                        {/* Subtitle */}
                         <div className="animate-blur-fade-in motion-reduce:animate-none [animation-delay:340ms]">
                             <p className="text-xl md:text-2xl lg:text-3xl text-white/90 mb-4 font-light">
                                 Your Luxury Escape at Tambuli Seaside Living
                             </p>
                         </div>
         
-                        {/* Location Badge */}
                         <div className="animate-blur-fade-in motion-reduce:animate-none [animation-delay:440ms]">
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white/90 mb-12">
                                 <MapPin className="w-4 h-4" aria-hidden="true" />
@@ -195,16 +182,9 @@ const LandingSection = () => {
                             </div>
                         </div>
         
-                        {/* CTA Buttons */}
                         <div className="animate-blur-fade-in motion-reduce:animate-none [animation-delay:540ms]">
                             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                                {/* Primary CTA - Shimmer Button */}
-                                <a
-                                    href={AIRBNB_LISTING_URL}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    aria-label="Book your stay on Airbnb (opens in new tab)"
-                                >
+                                <AirbnbLink>
                                     <ShimmerButton
                                         className="h-14 px-8 text-lg font-medium"
                                         shimmerColor={CTA_SHIMMER}
@@ -215,9 +195,7 @@ const LandingSection = () => {
                                             Book on Airbnb
                                         </span>
                                     </ShimmerButton>
-                                </a>
-        
-                                {/* Secondary CTA */}
+                                </AirbnbLink>
                                 <button
                                     type="button"
                                     onClick={handleExplore}
@@ -230,7 +208,6 @@ const LandingSection = () => {
                         </div>
                     </div>
         
-                    {/* Progress Bar + pause/play control */}
                     <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-10 flex items-center gap-3">
                         <div className="flex gap-2 w-48">
                             {heroImages.map((_, index) => (
@@ -264,7 +241,6 @@ const LandingSection = () => {
                         )}
                     </div>
         
-                    {/* Scroll Indicator */}
                     <div className="animate-blur-fade-in motion-reduce:animate-none [animation-delay:740ms]">
                         <button
                             type="button"

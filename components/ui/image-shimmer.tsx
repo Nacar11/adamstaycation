@@ -1,13 +1,15 @@
+import Image, { type ImageProps } from 'next/image'
 import { cn } from '@/lib/utils'
+
+type ShimmerTone = 'light' | 'dark'
 
 interface ImageShimmerProps {
     visible: boolean
-    /** `light` sweeps over sand (light sections); `dark` sweeps over ocean (dark sections) */
-    tone?: 'light' | 'dark'
+    tone?: ShimmerTone
     className?: string
 }
 
-// Skeleton placeholder for images: a soft light sweep over sand, cross-fading out once the image is ready
+// Skeleton sweep (sand on light sections, ocean on dark) that fades out once the image is ready
 export const ImageShimmer = ({ visible, tone = 'light', className }: ImageShimmerProps) => (
     <div
         aria-hidden="true"
@@ -25,4 +27,21 @@ export const ImageShimmer = ({ visible, tone = 'light', className }: ImageShimme
             )}
         />
     </div>
+)
+
+interface ShimmerImageProps extends ImageProps {
+    loaded: boolean
+    tone?: ShimmerTone
+}
+
+// next/image that shows ImageShimmer until `loaded`, then fades the photo in
+export const ShimmerImage = ({ loaded, tone, alt, className, ...props }: ShimmerImageProps) => (
+    <>
+        <ImageShimmer visible={!loaded} tone={tone} />
+        <Image
+            {...props}
+            alt={alt}
+            className={cn('transition-opacity duration-300 ease-out', loaded ? 'opacity-100' : 'opacity-0', className)}
+        />
+    </>
 )

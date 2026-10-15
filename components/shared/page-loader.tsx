@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { useLockBodyScroll } from '@/lib/hooks/use-lock-body-scroll'
 
 interface PageLoaderProps {
     visible: boolean
@@ -11,15 +11,7 @@ interface PageLoaderProps {
 const PageLoader = ({ visible }: PageLoaderProps) => {
     const prefersReducedMotion = useReducedMotion()
 
-    // Lock page scroll while the loader covers the viewport
-    useEffect(() => {
-        if (!visible) return
-        const { overflow } = document.body.style
-        document.body.style.overflow = 'hidden'
-        return () => {
-            document.body.style.overflow = overflow
-        }
-    }, [visible])
+    useLockBodyScroll(visible)
 
     return (
         <AnimatePresence>

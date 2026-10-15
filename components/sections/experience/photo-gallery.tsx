@@ -5,10 +5,13 @@ import Image from 'next/image'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { motion, AnimatePresence, useInView } from 'motion/react'
 import { BlurFade } from '@/components/ui/blur-fade'
-import { ImageShimmer } from '@/components/ui/image-shimmer'
-import { cn } from '@/lib/utils'
+import { ImageShimmer, ShimmerImage } from '@/components/ui/image-shimmer'
+import { SectionEyebrow, SectionHeading } from '@/components/shared/section-heading'
+import { cn, wrapIndex } from '@/lib/utils'
 import { preloadImage } from '@/lib/preload-image'
 import { useImageReadiness } from '@/lib/hooks/use-image-readiness'
+import { NEAR_VIEWPORT_MARGIN } from '@/lib/hooks/use-preload-when-near'
+import { useSwipe } from '@/lib/hooks/use-swipe'
 import { allCategories, galleryGroups, type GalleryCategory } from './data'
 import { GALLERY_PANEL_ID, GalleryCategoryPills, GalleryGroupTabs, galleryTabId } from './gallery-tabs'
 import GalleryLightbox from './gallery-lightbox'
@@ -18,36 +21,48 @@ import {
     GALLERY_PREFETCH_START_DELAY,
     GALLERY_PREFETCH_STAGGER,
     GALLERY_THUMB_SIZES,
-    NEAR_VIEWPORT_MARGIN,
     STAGGER_DELAY,
 } from './constants'
 
-// Photo gallery: group tabs → category pills → main image + thumbnail strip
+const ARROW_CLASS =
+    'absolute top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/92 backdrop-blur-sm flex items-center justify-center text-ocean-deep opacity-0 group-hover:opacity-100 transition-opacity duration-250 shadow-md focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-ocean/30 cursor-pointer'
+
+const isSaveDataOn = () => Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData)
+
+// Photo gallery: group tabs → category pills → main image + thumbnail strip + lightbox
 const PhotoGallery = () => {
     const { isLoaded, markLoaded } = useImageReadiness()
 
     const [activeGroupId, setActiveGroupId] = useState(galleryGroups[0].id)
     const [activeCategory, setActiveCategory] = useState(galleryGroups[0].categories[0].id)
-    const [currentImageIndexes, setCurrentImageIndexes] = useState<Record<string, number>>(
-        Object.fromEntries(allCategories.map((cat) => [cat.id, 0]))
-    )
+    const [imageIndexes, setImageIndexes] = useState<Record<string, number>>({})
+    const [isLightboxOpen, setIsLightboxOpen] = useState(false)
 
-    const activeGroup = galleryGroups.find((g) => g.id === activeGroupId) || galleryGroups[0]
-    const activeGallery = activeGroup.categories.find((cat) => cat.id === activeCategory) || activeGroup.categories[0]
-    const currentImageIndex = currentImageIndexes[activeCategory] || 0
+    const activeGroup = galleryGroups.find((g) => g.id === activeGroupId) ?? galleryGroups[0]
+    const activeGallery = activeGroup.categories.find((cat) => cat.id === activeCategory) ?? activeGroup.categories[0]
+    const imageCount = activeGallery.images.length
+    const currentImageIndex = imageIndexes[activeCategory] ?? 0
     const currentImage = activeGallery.images[currentImageIndex]
-
-    // ── Prefetching (keeps category/group switches instant) ──
     const isMainLoaded = isLoaded(`main:${currentImage.src}`)
 
+    const showImage = (index: number) =>
+        setImageIndexes((prev) => ({ ...prev, [activeCategory]: wrapIndex(index, imageCount) }))
+    const handlePrevImage = () => showImage(currentImageIndex - 1)
+    const handleNextImage = () => showImage(currentImageIndex + 1)
+    const swipeHandlers = useSwipe(handleNextImage, handlePrevImage)
+
+    const handleGroupChange = (groupId: string) => {
+        const group = galleryGroups.find((g) => g.id === groupId)
+        if (!group || groupId === activeGroupId) return
+        setActiveGroupId(groupId)
+        setActiveCategory(group.categories[0].id)
+    }
+
+    // Warm a category's first photo + all thumbnails so switching paints from cache
     const prefetchCategory = useCallback((category: GalleryCategory) => {
         const [firstImage] = category.images
-        if (firstImage) {
-            preloadImage(firstImage.src, GALLERY_MAIN_SIZES, () => markLoaded(`main:${firstImage.src}`))
-        }
-        category.images.forEach((img) => {
-            preloadImage(img.src, GALLERY_THUMB_SIZES, () => markLoaded(`thumb:${img.src}`))
-        })
+        if (firstImage) preloadImage(firstImage.src, GALLERY_MAIN_SIZES, () => markLoaded(`main:${firstImage.src}`))
+        category.images.forEach((img) => preloadImage(img.src, GALLERY_THUMB_SIZES, () => markLoaded(`thumb:${img.src}`)))
     }, [markLoaded])
 
     const handlePrefetchGroup = (groupId: string) => {
@@ -55,124 +70,56 @@ const PhotoGallery = () => {
         if (group) prefetchCategory(group.categories[0])
     }
 
-    // Once the gallery is near the viewport, quietly warm every category in the background
     const galleryRef = useRef<HTMLDivElement>(null)
     const isGalleryNear = useInView(galleryRef, { once: true, margin: NEAR_VIEWPORT_MARGIN })
 
     useEffect(() => {
-        if (!isGalleryNear) return
-        const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection
-        if (connection?.saveData) return
-
+        if (!isGalleryNear || isSaveDataOn()) return
         const timers = allCategories.map((category, i) =>
             window.setTimeout(() => prefetchCategory(category), GALLERY_PREFETCH_START_DELAY + i * GALLERY_PREFETCH_STAGGER)
         )
         return () => timers.forEach((timer) => window.clearTimeout(timer))
     }, [isGalleryNear, prefetchCategory])
 
-    // Preload the neighbours of the current photo so prev/next/swipe paint instantly
     useEffect(() => {
-        const { images } = activeGallery
-        if (images.length < 2) return
+        if (imageCount < 2) return
         ;[1, -1].forEach((step) => {
-            const neighbour = images[(currentImageIndex + step + images.length) % images.length]
+            const neighbour = activeGallery.images[wrapIndex(currentImageIndex + step, imageCount)]
             preloadImage(neighbour.src, GALLERY_MAIN_SIZES, () => markLoaded(`main:${neighbour.src}`))
         })
-    }, [activeGallery, currentImageIndex, markLoaded])
+    }, [activeGallery, imageCount, currentImageIndex, markLoaded])
 
-    const handleNextImage = () => {
-        setCurrentImageIndexes((prev) => ({
-            ...prev,
-            [activeCategory]: (prev[activeCategory] + 1) % activeGallery.images.length,
-        }))
-    }
-
-    const handlePrevImage = () => {
-        setCurrentImageIndexes((prev) => ({
-            ...prev,
-            [activeCategory]:
-                (prev[activeCategory] - 1 + activeGallery.images.length) % activeGallery.images.length,
-        }))
-    }
-
-    const handleDotClick = (index: number) => {
-        setCurrentImageIndexes((prev) => ({
-            ...prev,
-            [activeCategory]: index,
-        }))
-    }
-
-    const handleGroupChange = (groupId: string) => {
-        if (groupId === activeGroupId) return
-        setActiveGroupId(groupId)
-        const group = galleryGroups.find((g) => g.id === groupId)
-        if (group) {
-            setActiveCategory(group.categories[0].id)
-        }
-    }
-
-    // Keep the active thumbnail fully visible inside the strip (scrolls the strip only, never the page)
+    // Keep the active thumbnail centred in its strip (scrolls the strip, never the page)
     const thumbStripRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         const strip = thumbStripRef.current
         const thumb = strip?.children[currentImageIndex] as HTMLElement | undefined
         if (!strip || !thumb) return
-
         const stripRect = strip.getBoundingClientRect()
         const thumbRect = thumb.getBoundingClientRect()
-        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
         strip.scrollBy({
             top: thumbRect.top + thumbRect.height / 2 - (stripRect.top + stripRect.height / 2),
             left: thumbRect.left + thumbRect.width / 2 - (stripRect.left + stripRect.width / 2),
-            behavior: prefersReducedMotion ? 'auto' : 'smooth',
+            behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
         })
     }, [currentImageIndex, activeCategory])
 
-    // Fullscreen lightbox — shares the gallery's current index; focus returns to the photo on close
-    const [isLightboxOpen, setIsLightboxOpen] = useState(false)
     const lightboxTriggerRef = useRef<HTMLButtonElement>(null)
-
-    const handleOpenLightbox = () => setIsLightboxOpen(true)
 
     const handleCloseLightbox = useCallback(() => {
         setIsLightboxOpen(false)
         lightboxTriggerRef.current?.focus()
     }, [])
 
-    // Touch swipe for mobile gallery
-    const touchStartX = useRef(0)
-
-    const handleTouchStart = (e: React.TouchEvent) => {
-        touchStartX.current = e.touches[0].clientX
-    }
-
-    const handleTouchEnd = (e: React.TouchEvent) => {
-        const deltaX = e.changedTouches[0].clientX - touchStartX.current
-        if (Math.abs(deltaX) > 50) {
-            if (deltaX < 0) handleNextImage()
-            else handlePrevImage()
-        }
-    }
-
     return (
         <div className="bg-white py-16 md:py-20 border-t border-sand-dark/10">
             <div className="max-w-7xl mx-auto px-5 md:px-10">
-
-                {/* Header row: editorial label + heading + group toggle */}
                 <BlurFade delay={BASE_DELAY} inView>
                     <div className="mb-10">
-                        <p className="text-rust text-xs uppercase tracking-[0.22em] mb-5 font-semibold">
-                            Photo Gallery
-                        </p>
+                        <SectionEyebrow>Photo Gallery</SectionEyebrow>
                         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5">
-                            <h2 className="font-display text-ocean-deep text-4xl md:text-5xl lg:text-[3.5rem] leading-[1.08] tracking-tight">
-                                Every corner.{' '}
-                                <em className="text-rust">Every detail.</em>
-                            </h2>
-
-                            {/* Group toggle — right-aligned */}
+                            <SectionHeading lead="Every corner." accent="Every detail." />
                             <GalleryGroupTabs
                                 groups={galleryGroups}
                                 activeGroupId={activeGroupId}
@@ -183,7 +130,6 @@ const PhotoGallery = () => {
                     </div>
                 </BlurFade>
 
-                {/* Category pills — left-aligned, light style */}
                 <BlurFade delay={BASE_DELAY + STAGGER_DELAY} inView>
                     <GalleryCategoryPills
                         categories={activeGroup.categories}
@@ -193,7 +139,6 @@ const PhotoGallery = () => {
                     />
                 </BlurFade>
 
-                {/* Gallery — main image + thumbnail strip */}
                 <BlurFade delay={BASE_DELAY + STAGGER_DELAY * 1.5} inView>
                     <div
                         ref={galleryRef}
@@ -202,20 +147,17 @@ const PhotoGallery = () => {
                         id={GALLERY_PANEL_ID}
                         aria-labelledby={galleryTabId(activeGallery.id)}
                     >
-                        {/* Main image */}
                         <div
                             className="relative aspect-[4/3] md:aspect-[16/10] rounded-2xl overflow-hidden group bg-sand shadow-lg shadow-ocean/8"
-                            onTouchStart={handleTouchStart}
-                            onTouchEnd={handleTouchEnd}
+                            {...swipeHandlers}
                         >
                             <ImageShimmer visible={!isMainLoaded} />
 
-                            {/* The photo itself opens the fullscreen lightbox (arrows stay separate buttons) */}
                             <button
                                 ref={lightboxTriggerRef}
                                 type="button"
-                                onClick={handleOpenLightbox}
-                                aria-label={`Open ${activeGallery.title} photo ${currentImageIndex + 1} of ${activeGallery.images.length} in full screen`}
+                                onClick={() => setIsLightboxOpen(true)}
+                                aria-label={`Open ${activeGallery.title} photo ${currentImageIndex + 1} of ${imageCount} in full screen`}
                                 aria-haspopup="dialog"
                                 className="absolute inset-0 cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-rust"
                             >
@@ -244,52 +186,47 @@ const PhotoGallery = () => {
                                 </AnimatePresence>
                             </button>
 
-                            {/* Gradient scrim */}
                             <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent pointer-events-none" />
 
-                            {/* Image caption + counter */}
                             <div className="absolute bottom-0 left-0 right-0 px-5 py-4 flex items-end justify-between pointer-events-none">
                                 <div>
-                                    <p className="text-white font-semibold text-sm drop-shadow mb-0.5">
-                                        {activeGallery.title}
-                                    </p>
-                                    <p className="text-white/65 text-xs hidden md:block drop-shadow leading-snug">
-                                        {activeGallery.description}
-                                    </p>
+                                    <p className="text-white font-semibold text-sm drop-shadow mb-0.5">{activeGallery.title}</p>
+                                    <p className="text-white/65 text-xs hidden md:block drop-shadow leading-snug">{activeGallery.description}</p>
                                 </div>
                                 <span className="text-white/75 text-[11px] font-medium bg-black/25 backdrop-blur-sm px-2.5 py-1 rounded-full hidden md:block">
-                                    {currentImageIndex + 1} / {activeGallery.images.length}
+                                    {currentImageIndex + 1} / {imageCount}
                                 </span>
                             </div>
 
-                            {/* Prev / Next arrows */}
-                            {activeGallery.images.length > 1 && (
+                            {imageCount > 1 && (
                                 <>
                                     <motion.button
+                                        type="button"
                                         onClick={handlePrevImage}
                                         whileHover={{ scale: 1.08 }}
                                         whileTap={{ scale: 0.88 }}
                                         transition={{ duration: 0.15, ease: 'easeOut' }}
-                                        className="absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/92 backdrop-blur-sm flex items-center justify-center text-ocean-deep opacity-0 group-hover:opacity-100 transition-opacity duration-250 shadow-md focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-ocean/30 cursor-pointer"
+                                        className={cn(ARROW_CLASS, 'left-3')}
                                         aria-label="Previous image"
                                     >
-                                        <ChevronLeft className="w-5 h-5" strokeWidth={2} />
+                                        <ChevronLeft className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
                                     </motion.button>
                                     <motion.button
+                                        type="button"
                                         onClick={handleNextImage}
                                         whileHover={{ scale: 1.08 }}
                                         whileTap={{ scale: 0.88 }}
                                         transition={{ duration: 0.15, ease: 'easeOut' }}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/92 backdrop-blur-sm flex items-center justify-center text-ocean-deep opacity-0 group-hover:opacity-100 transition-opacity duration-250 shadow-md focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-ocean/30 cursor-pointer"
+                                        className={cn(ARROW_CLASS, 'right-3')}
                                         aria-label="Next image"
                                     >
-                                        <ChevronRight className="w-5 h-5" strokeWidth={2} />
+                                        <ChevronRight className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
                                     </motion.button>
                                 </>
                             )}
                         </div>
 
-                        {/* Thumbnail strip — vertical on desktop (height locked to the main image), horizontal scroll on mobile */}
+                        {/* Desktop: vertical strip locked to the main image height; mobile: horizontal */}
                         <div className="relative">
                             <div
                                 ref={thumbStripRef}
@@ -297,42 +234,38 @@ const PhotoGallery = () => {
                             >
                                 {activeGallery.images.map((img, i) => (
                                     <motion.button
-                                        key={i}
-                                        onClick={() => handleDotClick(i)}
+                                        key={img.src}
+                                        type="button"
+                                        onClick={() => showImage(i)}
                                         whileTap={{ scale: 0.94 }}
                                         transition={{ duration: 0.12, ease: 'easeOut' }}
-                                        aria-label={`View image ${i + 1} of ${activeGallery.images.length}`}
+                                        aria-label={`View image ${i + 1} of ${imageCount}`}
                                         aria-current={i === currentImageIndex ? 'true' : undefined}
                                         className={cn(
-                                            "relative flex-shrink-0 w-20 h-14 lg:w-full lg:h-auto lg:aspect-[4/3]",
-                                            "rounded-xl overflow-hidden cursor-pointer transition-all duration-200 bg-sand",
-                                            "focus:outline-none focus-visible:ring-2 focus-visible:ring-rust focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+                                            'relative flex-shrink-0 w-20 h-14 lg:w-full lg:h-auto lg:aspect-[4/3]',
+                                            'rounded-xl overflow-hidden cursor-pointer transition-all duration-200 bg-sand',
+                                            'focus:outline-none focus-visible:ring-2 focus-visible:ring-rust focus-visible:ring-offset-2 focus-visible:ring-offset-white',
                                             i === currentImageIndex
-                                                ? "ring-2 ring-rust ring-offset-2 ring-offset-white opacity-100"
-                                                : "opacity-50 hover:opacity-85"
+                                                ? 'ring-2 ring-rust ring-offset-2 ring-offset-white opacity-100'
+                                                : 'opacity-50 hover:opacity-85'
                                         )}
                                     >
-                                        <ImageShimmer visible={!isLoaded(`thumb:${img.src}`)} />
-                                        <Image
+                                        <ShimmerImage
                                             src={img.src}
                                             alt=""
                                             aria-hidden="true"
                                             fill
                                             sizes={GALLERY_THUMB_SIZES}
-                                            className={cn(
-                                                "object-cover transition-opacity duration-300 ease-out",
-                                                isLoaded(`thumb:${img.src}`) ? "opacity-100" : "opacity-0"
-                                            )}
+                                            loaded={isLoaded(`thumb:${img.src}`)}
                                             onLoad={() => markLoaded(`thumb:${img.src}`)}
+                                            className="object-cover"
                                         />
                                     </motion.button>
                                 ))}
                             </div>
                         </div>
-
                     </div>
                 </BlurFade>
-
             </div>
 
             <GalleryLightbox
@@ -340,7 +273,7 @@ const PhotoGallery = () => {
                 title={activeGallery.title}
                 images={activeGallery.images}
                 index={currentImageIndex}
-                onIndexChange={handleDotClick}
+                onIndexChange={showImage}
                 onClose={handleCloseLightbox}
             />
         </div>

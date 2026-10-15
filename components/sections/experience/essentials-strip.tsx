@@ -8,19 +8,16 @@ const EssentialsStrip = () => (
     <div className="bg-white border-t border-sand-dark/10">
         <BlurFade delay={BASE_DELAY} inView>
 
-            {/* — Section label — */}
             <div className="pt-8 pb-5 text-center">
                 <span className="text-[10px] uppercase tracking-[0.35em] text-ocean/75 font-medium">Everything Included</span>
             </div>
 
-            {/* — Amenities scrollable row — */}
             <div className="pb-7 relative">
-                {/* Fade masks — desktop only */}
                 <div className="absolute inset-y-0 left-0 w-10 md:w-20 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
                 <div className="absolute inset-y-0 right-0 w-10 md:w-20 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
 
                 <div className="overflow-x-auto px-5 md:px-10 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
-                    {/* w-max + mx-auto: centred when the row fits, scrolls from the first pill when it doesn't */}
+                    {/* w-max + mx-auto: centred when it fits, scrolls from the first pill when it doesn't */}
                     <div
                         className="flex flex-nowrap gap-0 w-max mx-auto"
                         role="list"
@@ -43,7 +40,6 @@ const EssentialsStrip = () => (
                 </div>
             </div>
 
-            {/* — Safety row — */}
             <div className="border-t border-sand-dark/10 py-4 px-5 md:px-10">
                 <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
                     <div className="flex items-center gap-1.5 flex-shrink-0">

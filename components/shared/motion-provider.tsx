@@ -6,7 +6,7 @@ interface MotionProviderProps {
     children: React.ReactNode
 }
 
-// Every motion/react animation (incl. Magic UI) drops transform/layout motion when the OS asks for reduced motion
+// All motion/react animations drop transform motion when the OS requests reduced motion
 const MotionProvider = ({ children }: MotionProviderProps) => (
     <MotionConfig reducedMotion="user">{children}</MotionConfig>
 )

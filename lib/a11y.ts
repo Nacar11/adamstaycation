@@ -3,11 +3,7 @@ import type { KeyboardEvent } from 'react'
 const NEXT_KEYS = ['ArrowRight', 'ArrowDown']
 const PREV_KEYS = ['ArrowLeft', 'ArrowUp']
 
-/**
- * Keyboard support for a WAI-ARIA `role="tablist"` with a roving tabindex and automatic activation:
- * ←/→ (and ↑/↓) move to the previous/next tab with wrap-around, Home/End jump to the ends.
- * Selects the target via `onSelect` and moves focus to it.
- */
+// WAI-ARIA tablist keys (arrows wrap, Home/End): selects the target tab and moves focus to it
 export const handleTablistKeyDown = (
     event: KeyboardEvent<HTMLElement>,
     count: number,

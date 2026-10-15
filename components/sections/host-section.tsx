@@ -1,8 +1,10 @@
 import Image from 'next/image'
 import { ArrowRight, ArrowUpRight, Mail, Phone, MapPin, type LucideIcon } from 'lucide-react'
-import { AIRBNB_LISTING_URL, CONTACT_EMAIL, MAPS_URL } from '@/lib/constants'
+import { CONTACT_EMAIL, MAPS_URL } from '@/lib/constants'
 import { BlurFade } from '@/components/ui/blur-fade'
 import { ShimmerButton } from '@/components/ui/shimmer-button'
+import AirbnbLink from '@/components/shared/airbnb-link'
+import { SectionEyebrow, SectionHeading } from '@/components/shared/section-heading'
 import { RUST_CTA_SHIMMER } from '@/lib/theme'
 
 const STAGGER_DELAY = 0.1
@@ -52,7 +54,6 @@ const HostSection = () => {
             <div className="max-w-6xl mx-auto px-5 md:px-10 py-16 md:py-24">
                 <div className="grid lg:grid-cols-[minmax(0,26rem)_1fr] xl:grid-cols-[minmax(0,32rem)_1fr] gap-12 lg:gap-20 items-center">
 
-                    {/* Portrait */}
                     <BlurFade delay={BASE_DELAY} inView>
                         <div className="relative aspect-[4/5] w-full max-w-md mx-auto lg:max-w-none rounded-2xl overflow-hidden shadow-xl shadow-ocean-deep/10">
                             <Image
@@ -65,19 +66,17 @@ const HostSection = () => {
                         </div>
                     </BlurFade>
 
-                    {/* Editorial content */}
                     <div className="min-w-0">
                         <BlurFade delay={BASE_DELAY + STAGGER_DELAY} inView>
-                            <p className="text-rust text-xs uppercase tracking-[0.22em] font-semibold mb-6">
-                                Meet the Owner&nbsp;·&nbsp;Adam&apos;s Staycation
-                            </p>
+                            <SectionEyebrow className="mb-6">Meet the Owner&nbsp;·&nbsp;Adam&apos;s Staycation</SectionEyebrow>
                         </BlurFade>
 
                         <BlurFade delay={BASE_DELAY + STAGGER_DELAY * 2} inView>
-                            <h2 className="font-display text-ocean-deep text-[2.75rem] md:text-6xl lg:text-[4rem] leading-[1.05] tracking-tight mb-8">
-                                Your host,{' '}
-                                <em className="text-rust">Dale Nacario.</em>
-                            </h2>
+                            <SectionHeading
+                                lead="Your host,"
+                                accent="Dale Nacario."
+                                className="text-[2.75rem] md:text-6xl lg:text-[4rem] leading-[1.05] mb-8"
+                            />
                         </BlurFade>
 
                         <BlurFade delay={BASE_DELAY + STAGGER_DELAY * 3} inView>
@@ -86,7 +85,6 @@ const HostSection = () => {
                             </p>
                         </BlurFade>
 
-                        {/* Contact table */}
                         <BlurFade delay={BASE_DELAY + STAGGER_DELAY * 4} inView>
                             <ul className="border-t border-sand-dark/50 mb-10">
                                 {contactInfo.map((item) => {
@@ -124,16 +122,9 @@ const HostSection = () => {
                             </ul>
                         </BlurFade>
 
-                        {/* CTAs */}
                         <BlurFade delay={BASE_DELAY + STAGGER_DELAY * 5} inView>
                             <div className="flex flex-wrap items-center gap-3">
-                                <a
-                                    href={AIRBNB_LISTING_URL}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-rust focus-visible:ring-offset-2 focus-visible:ring-offset-sand-light"
-                                    aria-label="Book your stay on Airbnb (opens in new tab)"
-                                >
+                                <AirbnbLink className="rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-rust focus-visible:ring-offset-2 focus-visible:ring-offset-sand-light">
                                     <ShimmerButton
                                         className="h-12 px-7 text-[15px] font-semibold border-transparent hover:brightness-110 transition-[filter] duration-200"
                                         shimmerColor={RUST_CTA_SHIMMER}
@@ -147,7 +138,7 @@ const HostSection = () => {
                                             <ArrowRight className="w-4 h-4" aria-hidden="true" />
                                         </span>
                                     </ShimmerButton>
-                                </a>
+                                </AirbnbLink>
 
                                 <a
                                     href={`mailto:${CONTACT_EMAIL}`}
@@ -163,7 +154,6 @@ const HostSection = () => {
                 </div>
             </div>
 
-            {/* Footer */}
             <footer className="border-t border-sand-dark/20 py-6 px-4 md:px-10">
                 <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
                     <span className="font-display text-xl text-ocean-deep">

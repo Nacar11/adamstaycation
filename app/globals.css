@@ -80,7 +80,7 @@
   }
 }
 
-/* Hero slideshow progress bar (driven by an inline animation duration) */
+/* Hero slideshow progress bar */
 @keyframes hero-progress {
   from {
     transform: scaleX(0);

@@ -8,10 +8,7 @@ const subscribeToVisibility = (onChange: () => void) => {
 
 const getIsDocumentVisible = () => document.visibilityState === 'visible'
 
-/**
- * True while the element is on screen AND the browser tab is visible.
- * Gate autoplay timers and animation loops on this so they never run unseen.
- */
+// True while the element is on screen and the tab is visible — gate timers and animation loops on it
 export const useIsActive = (ref: RefObject<Element>) => {
     const isInView = useInView(ref)
     const isDocumentVisible = useSyncExternalStore(subscribeToVisibility, getIsDocumentVisible, () => true)

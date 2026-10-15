@@ -1,7 +1,4 @@
-/**
- * Scrolls an element into view — smoothly, unless the visitor prefers reduced motion.
- * Accepts an element id ("experience") or a selector ("#experience").
- */
+// Scrolls to an id or #selector — smooth unless the visitor prefers reduced motion
 export const scrollToTarget = (target: string) => {
     const element = document.querySelector(target.startsWith('#') ? target : `#${target}`)
     if (!element) return false

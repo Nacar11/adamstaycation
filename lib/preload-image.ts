@@ -2,10 +2,7 @@ import { getImageProps } from 'next/image'
 
 const requested = new Set<string>()
 
-/**
- * Warms the browser cache with the exact variant `next/image` will request for the same `src` + `sizes`,
- * so switching to it later paints from cache instead of hitting the network.
- */
+// Warms the cache with the exact variant next/image will request for the same src + sizes
 export const preloadImage = (src: string, sizes: string, onLoad?: () => void) => {
     if (typeof window === 'undefined') return
 

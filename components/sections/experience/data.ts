@@ -100,7 +100,7 @@ export const safetyFeatures: string[] = [
     'Noise monitors'
 ]
 
-// Single source for room facts — rendered in the Dita grid and the JSON-LD listing
+// Room facts shared by the Dita grid and the JSON-LD listing
 export const ROOM = { maxGuests: 3, queenBeds: 1, floorSizeSqm: 35 }
 
 export const roomSpecs: RoomSpec[] = [
@@ -254,7 +254,6 @@ export const aboutGridImages: GalleryImage[] = [
     { src: '/images/studio/photo-gallery-studio-5.jpg', alt: 'Studio sleeping area' },
 ]
 
-// Dita Building intro — bolded lead + supporting detail
 export const aboutHighlights = [
     {
         highlight: 'Fully furnished & move-in ready.',
@@ -270,7 +269,6 @@ export const aboutHighlights = [
     },
 ]
 
-// Arrival steps shown under the Dita Building intro
 export const arrivalSteps = [
     {
         title: 'Arrive at Tambuli',

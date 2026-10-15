@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { Menu, X } from 'lucide-react'
-import { AIRBNB_LISTING_URL } from '@/lib/constants'
 import { ShimmerButton } from '@/components/ui/shimmer-button'
+import AirbnbLink from '@/components/shared/airbnb-link'
 import { cn } from '@/lib/utils'
 import { scrollToTarget } from '@/lib/scroll'
 import { CTA_GRADIENT, CTA_SHIMMER } from '@/lib/theme'
@@ -53,7 +53,6 @@ const Navbar = () => {
                 aria-label="Main navigation"
             >
                 <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-                    {/* Logo */}
                     <a
                         href="#home"
                         onClick={(e) => handleNavClick(e, '#home')}
@@ -66,7 +65,6 @@ const Navbar = () => {
                         Adam&apos;s Staycation
                     </a>
 
-                    {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center gap-8">
                         {navLinks.map((link) => (
                             <a
@@ -82,12 +80,7 @@ const Navbar = () => {
                                 {link.label}
                             </a>
                         ))}
-                        <a
-                            href={AIRBNB_LISTING_URL}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Book your stay on Airbnb (opens in new tab)"
-                        >
+                        <AirbnbLink>
                             <ShimmerButton
                                 className="h-10 px-6 text-sm font-medium"
                                 shimmerColor={CTA_SHIMMER}
@@ -96,10 +89,9 @@ const Navbar = () => {
                             >
                                 <span className="text-white">Book Now</span>
                             </ShimmerButton>
-                        </a>
+                        </AirbnbLink>
                     </div>
 
-                    {/* Mobile Menu Button */}
                     <button
                         className={cn(
                             "md:hidden p-3 transition-colors duration-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-coral",
@@ -115,7 +107,6 @@ const Navbar = () => {
                 </div>
             </motion.nav>
 
-            {/* Mobile Menu Overlay */}
             <AnimatePresence>
                 {isMobileMenuOpen && (
                     <>
@@ -162,13 +153,7 @@ const Navbar = () => {
                                             {link.label}
                                         </a>
                                     ))}
-                                    <a
-                                        href={AIRBNB_LISTING_URL}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="mt-4"
-                                        aria-label="Book your stay on Airbnb (opens in new tab)"
-                                    >
+                                    <AirbnbLink className="mt-4">
                                         <ShimmerButton
                                             className="w-full h-14 text-base font-medium"
                                             shimmerColor={CTA_SHIMMER}
@@ -177,7 +162,7 @@ const Navbar = () => {
                                         >
                                             <span className="text-white">Book on Airbnb</span>
                                         </ShimmerButton>
-                                    </a>
+                                    </AirbnbLink>
                                 </nav>
                             </div>
                         </motion.div>
