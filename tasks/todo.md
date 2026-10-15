@@ -38,11 +38,21 @@ See `tasks/plan.md` for the description, acceptance criteria and verification fo
 > Checkpoint 4 Lighthouse (local prod build): Desktop Perf 95 · A11y 100 · BP 96* · SEO 100 — Mobile (devtools throttling) Perf 98, LCP 2.1 s; (simulated) Perf 85. *only local-only /_vercel/insights 404
 
 ## Phase 5: Maintainability and monitoring
-- [ ] T15: Replace hard-coded hex with tokens; gallery active pill and thumbnail ring → rust (Q3 = B) (S)
-- [ ] T16: Add Vercel Speed Insights (XS)
-- [ ] ✅ Checkpoint 5: all criteria met, final Lighthouse vs baseline, push
+- [x] T15: Replace hard-coded hex with tokens; gallery active pill and thumbnail ring → rust (Q3 = B) (S)
+- [x] T16: Add Vercel Speed Insights (XS)
+- [x] ✅ Checkpoint 5: all criteria met, final Lighthouse vs baseline, push
 
 ## Open questions (needed before the blocked tasks)
 - [x] Q1: Production domain → `https://adamstaycation.business`
 - [x] Q2: Build a real fullscreen lightbox (T17)
 - [x] Q3: Option B: gallery active pill and thumbnail ring → rust, everything else stays coral
+
+## Final results (local production build, Lighthouse 12)
+| Run | Perf | A11y | BP | SEO | LCP | TBT | CLS |
+|---|---|---|---|---|---|---|---|
+| Checkpoint 3 baseline (desktop) | 71 | 97 | 96 | 100 | 1.9 s | 460 ms | 0 |
+| Final desktop | 95 | 100 | 96* | 100 | 1.6 s | 0 ms | 0 |
+| Final mobile (devtools throttling) | 98 | 100 | 96* | 100 | 2.1 s | 0 ms | 0.002 |
+| Final mobile (simulated) | 84 | 100 | 96* | 100 | 4.5 s | 0 ms | 0.002 |
+
+*only the local-only `/_vercel/insights` 404. First Load JS 199 kB -> 163 kB. Photos 495 MB -> 45 MB.
