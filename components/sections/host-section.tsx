@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { ArrowRight, ArrowUpRight, Mail, Phone, MapPin, type LucideIcon } from 'lucide-react'
-import { AIRBNB_LISTING_URL, CONTACT_EMAIL } from '@/lib/constants'
+import { AIRBNB_LISTING_URL, CONTACT_EMAIL, MAPS_URL } from '@/lib/constants'
 import { BlurFade } from '@/components/ui/blur-fade'
 import { ShimmerButton } from '@/components/ui/shimmer-button'
 
@@ -39,7 +39,7 @@ const contactInfo: ContactItem[] = [
         external: true,
         ariaLabel: 'Open Tambuli Seaside Living in Google Maps (opens in new tab)',
         value: 'Tambuli Seaside Living, Lapu-Lapu City, Cebu',
-        href: 'https://www.google.com/maps/place/Tambuli+Seaside+Resort+and+Spa/@10.2899858,124.0020002,17z/data=!3m1!4b1!4m9!3m8!1s0x33a99732246dcbc5:0x61ef43a187a2080a!5m2!4m1!1i2!8m2!3d10.2899858!4d124.0068711!16s%2Fg%2F11h_3t257r?entry=ttu&g_ep=EgoyMDI2MDMxNy4wIKXMDSoASAFQAw%3D%3D',
+        href: MAPS_URL,
     },
 ]
 
