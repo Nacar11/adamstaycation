@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import MotionProvider from '@/components/shared/motion-provider'
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, THEME_COLOR } from '@/lib/constants'
 import './globals.css'
@@ -78,6 +79,7 @@ export default function RootLayout({
             <body className="font-sans antialiased">
                 <MotionProvider>{children}</MotionProvider>
                 <Analytics />
+                <SpeedInsights />
             </body>
         </html>
     )
