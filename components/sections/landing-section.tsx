@@ -2,7 +2,7 @@
 
 import { Fragment, useState, useEffect, useCallback, useRef } from 'react'
 import Image from 'next/image'
-import { ChevronDown, MapPin } from 'lucide-react'
+import { ChevronDown, MapPin, Pause, Play } from 'lucide-react'
 import { AIRBNB_LISTING_URL } from '@/lib/constants'
 import { BlurFade } from '@/components/ui/blur-fade'
 import { TextAnimate } from '@/components/ui/text-animate'
@@ -80,7 +80,20 @@ export default function LandingSection() {
     // Start the slideshow only once every slide is ready, so it never crossfades into a blurry placeholder.
     // Reduced motion: hold on the first photo (no autoplay, no Ken Burns zoom, no particles).
     const prefersReducedMotion = usePrefersReducedMotion()
-    const isSlideshowRunning = areAllImagesSettled && !prefersReducedMotion
+    const canAutoplay = areAllImagesSettled && !prefersReducedMotion
+
+    // WCAG 2.2.2: visitors can pause the auto-advancing slideshow
+    const [isPaused, setIsPaused] = useState(false)
+    const [resumeCount, setResumeCount] = useState(0)
+    const isSlideshowRunning = canAutoplay && !isPaused
+
+    const handleTogglePause = () => {
+        setIsPaused((paused) => {
+            // Resuming restarts the timer, so restart the progress bar with it
+            if (paused) setResumeCount((count) => count + 1)
+            return !paused
+        })
+    }
 
     useEffect(() => {
         if (!isSlideshowRunning) return
@@ -237,21 +250,38 @@ export default function LandingSection() {
                         </BlurFade>
                     </div>
         
-                    {/* Progress Bar */}
-                    <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-10 flex gap-2 w-48">
-                        {heroImages.map((_, index) => (
-                            <div key={index} className="flex-1 h-[2px] bg-white/20 rounded-full overflow-hidden">
-                                {isSlideshowRunning && index === currentImageIndex && (
-                                    <div
-                                        key={`progress-${currentImageIndex}`}
-                                        className="h-full bg-white/70 rounded-full origin-left"
-                                        style={{
-                                            animation: `hero-progress ${SLIDE_DURATION}ms linear forwards`,
-                                        }}
-                                    />
+                    {/* Progress Bar + pause/play control */}
+                    <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-10 flex items-center gap-3">
+                        <div className="flex gap-2 w-48">
+                            {heroImages.map((_, index) => (
+                                <div key={index} className="flex-1 h-[2px] bg-white/20 rounded-full overflow-hidden">
+                                    {canAutoplay && index === currentImageIndex && (
+                                        <div
+                                            key={`progress-${currentImageIndex}-${resumeCount}`}
+                                            className="h-full bg-white/70 rounded-full origin-left"
+                                            style={{
+                                                animation: `hero-progress ${SLIDE_DURATION}ms linear forwards`,
+                                                animationPlayState: isPaused ? 'paused' : 'running',
+                                            }}
+                                        />
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                        {canAutoplay && (
+                            <button
+                                type="button"
+                                onClick={handleTogglePause}
+                                aria-label={isPaused ? 'Play slideshow' : 'Pause slideshow'}
+                                className="w-11 h-11 flex items-center justify-center rounded-full text-white/80 bg-white/10 border border-white/20 backdrop-blur-sm transition-colors duration-200 hover:bg-white/20 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                            >
+                                {isPaused ? (
+                                    <Play className="w-3.5 h-3.5 translate-x-px" fill="currentColor" aria-hidden="true" />
+                                ) : (
+                                    <Pause className="w-3.5 h-3.5" fill="currentColor" aria-hidden="true" />
                                 )}
-                            </div>
-                        ))}
+                            </button>
+                        )}
                     </div>
         
                     {/* Scroll Indicator */}
