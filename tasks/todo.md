@@ -3,11 +3,11 @@
 See `tasks/plan.md` for the description, acceptance criteria and verification for each task.
 
 ## Phase 0: Clean start
-- [ ] T0: Commit pending "Everything Included" centering change (XS)
+- [x] T0: Commit pending "Everything Included" centering change (XS)
 
 ## Phase 1: Safety net
-- [ ] T1: Make `build` + `lint` green (exclude skill submodule, add ESLint config, fix lint) (S)
-- [ ] T2: Use one animation library: `framer-motion` → `motion/react` (S)
+- [x] T1: Make `build` + `lint` green (exclude skill submodule, add ESLint config, fix lint) (S)
+- [x] T2: Use one animation library: `framer-motion` → `motion/react` (S)
 - [ ] ✅ Checkpoint 1: build/lint/tsc green, bundle delta recorded, review, push
 
 ## Phase 2: Restructure (no visual change)
