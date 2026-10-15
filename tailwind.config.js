@@ -31,6 +31,8 @@ module.exports = {
         'skeleton-shimmer': 'skeletonShimmer 1.6s ease-in-out infinite',
         // CSS twin of BlurFade so above-the-fold reveals paint without JS
         'blur-fade-in': 'blurFadeIn 0.4s ease-out both',
+        'shimmer-slide': 'shimmerSlide var(--speed) ease-in-out infinite alternate',
+        'spin-around': 'spinAround calc(var(--speed) * 2) infinite linear',
       },
       keyframes: {
         float: {
@@ -44,6 +46,16 @@ module.exports = {
         blurFadeIn: {
           '0%': { opacity: '0', transform: 'translateY(-6px)', filter: 'blur(6px)' },
           '100%': { opacity: '1', transform: 'none', filter: 'blur(0)' },
+        },
+        // ShimmerButton spark: slides across the button while rotating
+        shimmerSlide: {
+          to: { transform: 'translate(calc(100cqw - 100%), 0)' },
+        },
+        spinAround: {
+          '0%': { transform: 'translateZ(0) rotate(0)' },
+          '15%, 35%': { transform: 'translateZ(0) rotate(90deg)' },
+          '65%, 85%': { transform: 'translateZ(0) rotate(270deg)' },
+          '100%': { transform: 'translateZ(0) rotate(360deg)' },
         },
       },
       borderRadius: {
