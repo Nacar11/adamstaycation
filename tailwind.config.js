@@ -80,9 +80,23 @@ module.exports = {
   			'slide-up': 'slideUp 0.5s ease-out forwards',
   			stagger: 'stagger 0.05s ease-out forwards',
   			float: 'float 3s ease-in-out infinite',
-  			'skeleton-shimmer': 'skeletonShimmer 1.6s ease-in-out infinite'
+  			'skeleton-shimmer': 'skeletonShimmer 1.6s ease-in-out infinite',
+  			// CSS twin of Magic UI BlurFade (6px blur + 6px drop, 0.4s) — runs from HTML, no JS needed
+  			'blur-fade-in': 'blurFadeIn 0.4s ease-out both'
   		},
   		keyframes: {
+  			blurFadeIn: {
+  				'0%': {
+  					opacity: '0',
+  					transform: 'translateY(-6px)',
+  					filter: 'blur(6px)'
+  				},
+  				'100%': {
+  					opacity: '1',
+  					transform: 'none',
+  					filter: 'blur(0)'
+  				}
+  			},
   			skeletonShimmer: {
   				'0%': {
   					transform: 'translateX(-100%)'

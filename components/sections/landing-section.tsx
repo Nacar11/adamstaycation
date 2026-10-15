@@ -4,7 +4,6 @@ import { Fragment, useState, useEffect, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import { ChevronDown, MapPin, Pause, Play } from 'lucide-react'
 import { AIRBNB_LISTING_URL } from '@/lib/constants'
-import { BlurFade } from '@/components/ui/blur-fade'
 import { TextAnimate } from '@/components/ui/text-animate'
 import { ShimmerButton } from '@/components/ui/shimmer-button'
 import { DotPattern } from '@/components/ui/dot-pattern'
@@ -18,8 +17,8 @@ import heroImage1 from '@/public/images/banner/landing-page-1.jpg'
 import heroImage2 from '@/public/images/banner/landing-page-2.jpg'
 import heroImage3 from '@/public/images/banner/landing-page-3.jpg'
 
-const STAGGER_DELAY = 0.1
-const BASE_DELAY = 0.2
+// Hero reveals use the CSS `animate-blur-fade-in` (paints from HTML, no JS) with the standard
+// stagger: 240 / 340 / 440 / 540 / 740 ms — same timing BlurFade would give (0.2s base + 0.1s steps + 0.04s)
 const SLIDE_DURATION = 7000
 // Only show the branded loader if the first hero photo is still missing after this — cached/fast loads never see it
 const LOADER_DELAY = 400
@@ -193,7 +192,7 @@ export default function LandingSection() {
                 <Fragment key={contentKey}>
                     <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
                         {/* Animated Title */}
-                        <BlurFade delay={BASE_DELAY} inView>
+                        <div className="animate-blur-fade-in motion-reduce:animate-none [animation-delay:240ms]">
                             <TextAnimate
                                 as="h1"
                                 animation="blurInUp"
@@ -202,25 +201,25 @@ export default function LandingSection() {
                             >
                                 Adam&apos;s Staycation
                             </TextAnimate>
-                        </BlurFade>
+                        </div>
         
                         {/* Subtitle */}
-                        <BlurFade delay={BASE_DELAY + STAGGER_DELAY} inView>
+                        <div className="animate-blur-fade-in motion-reduce:animate-none [animation-delay:340ms]">
                             <p className="text-xl md:text-2xl lg:text-3xl text-white/90 mb-4 font-light">
                                 Your Luxury Escape at Tambuli Seaside Living
                             </p>
-                        </BlurFade>
+                        </div>
         
                         {/* Location Badge */}
-                        <BlurFade delay={BASE_DELAY + STAGGER_DELAY * 2} inView>
+                        <div className="animate-blur-fade-in motion-reduce:animate-none [animation-delay:440ms]">
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white/90 mb-12">
                                 <MapPin className="w-4 h-4" aria-hidden="true" />
                                 <span className="text-sm md:text-base font-medium">Lapu-Lapu City, Cebu</span>
                             </div>
-                        </BlurFade>
+                        </div>
         
                         {/* CTA Buttons */}
-                        <BlurFade delay={BASE_DELAY + STAGGER_DELAY * 3} inView>
+                        <div className="animate-blur-fade-in motion-reduce:animate-none [animation-delay:540ms]">
                             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                                 {/* Primary CTA - Shimmer Button */}
                                 <a
@@ -252,7 +251,7 @@ export default function LandingSection() {
                                     Explore Amenities
                                 </button>
                             </div>
-                        </BlurFade>
+                        </div>
                     </div>
         
                     {/* Progress Bar + pause/play control */}
@@ -290,7 +289,7 @@ export default function LandingSection() {
                     </div>
         
                     {/* Scroll Indicator */}
-                    <BlurFade delay={BASE_DELAY + STAGGER_DELAY * 5} inView>
+                    <div className="animate-blur-fade-in motion-reduce:animate-none [animation-delay:740ms]">
                         <div
                             className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/70 flex flex-col items-center gap-2 cursor-pointer z-10"
                             onClick={() => scrollToSection('experience')}
@@ -304,7 +303,7 @@ export default function LandingSection() {
                                 <ChevronDown className="w-6 h-6" aria-hidden="true" />
                             </div>
                         </div>
-                    </BlurFade>
+                    </div>
                 </Fragment>
             </section>
         </>
