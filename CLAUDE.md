@@ -4,27 +4,53 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Brand name: Adam's Staycation** (the repo is named `dalestaycation` but the product/website is Adam's Staycation). Single-page marketing site for an Airbnb property (Tambuli Seaside Living, Lapu-Lapu City, Cebu). Built with Next.js 14 (App Router) and TypeScript. No tests — lint is the only CI check.
+**Brand name: Adam's Staycation** (the repo is named `dalestaycation` but the product/website is Adam's Staycation). Single-page marketing site for an Airbnb property (Tambuli Seaside Living, Lapu-Lapu City, Cebu). Built with Next.js 14 (App Router), TypeScript and Tailwind CSS v3. Production: `https://adamstaycation.business` (Vercel; pushing `main` deploys).
 
 ## Commands
 
 - `npm run dev` — Start dev server
-- `npm run build` — Production build
-- `npm run lint` — ESLint
+- `npm run build` — Production build (also type-checks)
+- `npm run lint` — ESLint (`next/core-web-vitals`); must report zero warnings
 - `npm start` — Serve production build
+- `scripts/optimize-images.sh` — Shrink new photos in `public/images` (macOS `sips`, ≤2048px, q75) before committing
+
+No test suite — `build` + `lint` are the CI checks. Verify UI changes in a browser at 1440px and 390px.
 
 ## Architecture
 
-Single page (`app/page.tsx`) with three scrollable sections: `LandingSection` → `ExperienceSection` → `HostSection`, wrapped by `Navbar`.
+`app/page.tsx`: skip link → `StructuredData` (JSON-LD) → `Navbar` → `<main id="main">` with `LandingSection` → `ExperienceSection` → `HostSection`.
 
-**Component layers:**
-- `components/sections/` — Page sections; all use `'use client'` for Framer Motion `useInView` scroll animations
-- `components/shared/` — Navbar and other layout primitives
-- `components/ui/` — Magic UI / shadcn-style animated primitives installed via `npx shadcn@latest add "https://magicui.design/r/[component].json"`
-- `lib/constants.ts` — `AIRBNB_LISTING_URL` and `CONTACT_EMAIL` (single source of truth for external links)
-- `lib/utils.ts` — `cn()` (clsx + tailwind-merge)
+- `app/layout.tsx` — metadata (SEO/OG), `viewport`, fonts, `MotionProvider`, Vercel Analytics + Speed Insights
+- `app/sitemap.ts`, `app/robots.ts` — generated from `SITE_URL`
+- `components/sections/` — page sections
+  - `landing-section.tsx` — hero slideshow, `PageLoader` (shown only if the first photo is slow), pause control
+  - `experience-section.tsx` — server component composing `experience/*`:
+    `highlights`, `dita-about`, `essentials-strip`, `resort-access`, `photo-gallery` (+ `gallery-tabs`, `gallery-lightbox`)
+  - `experience/data.ts` — all copy, images and room facts (`ROOM`); `experience/constants.ts` — reveal timing, `sizes`, cadences
+  - `host-section.tsx` — server component (owner, contacts, CTAs, footer)
+- `components/shared/` — `navbar`, `page-loader`, `structured-data`, `motion-provider`, `section-heading`, `airbnb-link`
+- `components/ui/` — Magic UI primitives + `image-shimmer` (`ImageShimmer`, `ShimmerImage`)
+- `lib/constants.ts` — `AIRBNB_LISTING_URL`, `CONTACT_EMAIL`, `SITE_URL`, `MAPS_URL`, property address/geo (single source of truth)
+- `lib/theme.ts` — colour values for props that can't take classes (e.g. `ShimmerButton`), built from CSS variables
+- `lib/utils.ts` — `cn()`, `wrapIndex()`; `lib/scroll.ts` — `scrollToTarget()`; `lib/a11y.ts` — `handleTablistKeyDown()`; `lib/preload-image.ts` — `preloadImage()`
+- `lib/hooks/` — `useImageReadiness`, `usePreloadWhenNear`, `useIsActive`, `usePrefersReducedMotion`, `useLockBodyScroll`, `useSwipe`
 
-Static property images live in `public/images/` organized by room/area (studio, pool, beach, gym, etc.).
+Static photos live in `public/images/` by area (studio, pool, beach, gym, …).
+
+## Reuse First
+
+Before writing markup or logic, use the existing building blocks:
+
+| Need | Use |
+|---|---|
+| Section eyebrow + `h2` with italic accent | `SectionEyebrow`, `SectionHeading` (`tone="dark"` on ocean backgrounds) |
+| Image with skeleton + fade-in | `ShimmerImage` with `useImageReadiness` |
+| Preload images before they scroll in | `usePreloadWhenNear` (or `preloadImage` with the same `sizes` as the `<Image>`) |
+| Link to the Airbnb listing | `AirbnbLink` |
+| Carousel/gallery index maths | `wrapIndex` |
+| Pause timers / loops when unseen | `useIsActive` |
+| Branch rendering on reduced motion | `usePrefersReducedMotion` (hydration-safe) |
+| Swipe, scroll lock, tab keyboard support | `useSwipe`, `useLockBodyScroll`, `handleTablistKeyDown` |
 
 ## Design System
 
@@ -33,123 +59,62 @@ Static property images live in `public/images/` organized by room/area (studio, 
 | Token | Hex | Usage |
 |---|---|---|
 | `sand-light` | `#F5F0E8` | Primary backgrounds, cards |
-| `sand` | `#E8DFD0` | Secondary backgrounds |
-| `sand-dark` | `#C4B8A5` | Borders, muted text |
+| `sand` | `#E8DFD0` | Secondary backgrounds, image placeholders |
+| `sand-dark` | `#C4B8A5` | Borders, dividers |
 | `ocean-light` | `#E6F2F5` | Accent backgrounds |
-| `ocean` | `#1E4D5C` | Primary text, CTAs, navigation |
-| `ocean-deep` | `#0D2B33` | Headings, overlays |
-| `coral` | `#E07A5F` | Accent CTAs, highlights |
-| `rust` | `#A8472A` | Text accent on light backgrounds: eyebrow labels, italic heading accents, primary CTA fill |
-| `peach` | `#F0A98C` | Text accent on `ocean-deep` backgrounds: eyebrows, italic heading accents, CTA fill |
+| `ocean` | `#1E4D5C` | Body text (`/75` on white, `/80` on sand for AA), navigation |
+| `ocean-deep` | `#0D2B33` | Headings, dark sections, overlays |
+| `coral` / `coral-dark` | `#E07A5F` / `#C96A52` | Booking CTAs (`CTA_GRADIENT`), highlights |
+| `rust` | `#A8472A` | Text accents on light backgrounds: eyebrows, italic heading accents, active states |
+| `peach` | `#F0A98C` | Text accents and CTAs on `ocean-deep` |
 
-**Heading pattern:** `font-display` regular weight in `ocean-deep` (or `sand-light` on dark), with the second phrase in `<em>` using `rust` (or `peach` on dark). Example: `Every corner. <em className="text-rust">Every detail.</em>`
+Text must meet WCAG AA (4.5:1). Hex values live only in `tailwind.config.js` and `app/globals.css`.
 
 ### Typography
-- `font-display` (Playfair Display) — H1/H2 display headings
-- `font-sans` (Inter) — body text and UI elements
+- `font-display` (Playfair Display) — headings; pattern: regular-weight lead + `<em>` accent (via `SectionHeading`)
+- `font-sans` (Inter) — body text and UI
 
-### Utility classes (defined in `app/globals.css`)
-- `glass-effect`, `glass-card` — glassmorphism
-- `animate-fade-in`, `animate-slide-up`, `animate-float`, `animate-stagger` — CSS keyframe animations
-- Premium shadow utilities
+### Utilities (`app/globals.css` / `tailwind.config.js`)
+- `glass-effect` — translucent glass button background
+- `animate-blur-fade-in` — CSS twin of `BlurFade`; use for above-the-fold reveals so LCP text paints without JS
+- `animate-skeleton-shimmer`, `animate-float`
 
 ## Magic UI Integration
 
-**Component selection hierarchy** (always prefer in this order):
-1. **Magic UI** — text effects, animated buttons, cards with hover effects, background effects, scroll reveals
-2. **shadcn/ui** — form controls and utilities not covered by Magic UI
-3. **Framer Motion wrappers** — only when neither above fits
-4. **Custom component** — last resort
+**Selection hierarchy:** Magic UI → shadcn/ui (form controls) → Framer-style `motion/react` wrappers → custom component.
 
-**Installing new Magic UI components:**
 ```bash
 npx shadcn@latest add "https://magicui.design/r/[component-name].json"
-# e.g.: blur-fade, magic-card, shimmer-button, text-animate, neon-gradient-card
 ```
 
-**Key components already installed and their roles:**
-- `BlurFade` — all scroll-triggered content reveals (use `inView` prop)
-- `TextAnimate` — section titles and hero text
-- `MagicCard` — amenity/feature cards with spotlight hover
-- `ShimmerButton` — primary CTAs ("Book Your Stay")
-- `NumberTicker`, `Marquee`, `Particles`, `DotPattern`, `Ripple`, `BorderBeam`, `ShineBorder`, `NeonGradientCard`, `AnimatedShinyText`
+Installed and in use: `BlurFade` (scroll reveals below the fold, `inView`), `TextAnimate` (hero title), `ShimmerButton` (CTAs), `NumberTicker`, `Particles`, `DotPattern` (static `<pattern>` rewrite — don't reinstall over it). Delete components that end up unused.
 
-**Standard stagger pattern for lists:**
-```typescript
-const BASE_DELAY = 0.2
-const STAGGER_DELAY = 0.1
+**Stagger pattern:** `BASE_DELAY = 0.2`, `STAGGER_DELAY = 0.1` → `<BlurFade delay={BASE_DELAY + STAGGER_DELAY * index} inView>`.
 
-{items.map((item, index) => (
-  <BlurFade key={item.id} delay={BASE_DELAY + STAGGER_DELAY * index} inView direction="up">
-    <MagicCard gradientColor="rgba(30, 77, 92, 0.15)">{/* content */}</MagicCard>
-  </BlurFade>
-))}
-```
+**Motion:** import from `motion/react` only (never `framer-motion`). `MotionProvider` sets `reducedMotion="user"` globally.
 
-**Adapting Magic UI colors to design tokens:**
-```typescript
-// MagicCard spotlight color
-gradientColor="rgba(30, 77, 92, 0.15)"  // ocean
+## Performance Rules
 
-// ShimmerButton
-shimmerColor="rgba(224, 122, 95, 0.3)"  // coral
-
-// NeonGradientCard
-neonColors={{ firstColor: "#E07A5F", secondColor: "#1E4D5C" }}  // coral + ocean
-```
-
-## Framer Motion Standards
-
-```typescript
-const fadeInUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
-}
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.05, delayChildren: 0.3 } },
-}
-```
-
-| Animation | Duration | Trigger |
-|---|---|---|
-| Fade In | 600ms ease-out | Scroll into view |
-| Slide Up | 500ms ease-out | Scroll into view |
-| Scale Tap | 100ms ease-in-out | Button press |
-| Hover Zoom | 300ms ease-out | Mouse enter |
-| Float | 3000ms ease-in-out | Continuous |
-
-For heavy components (`Globe`, `IconCloud`), use `dynamic()` with `ssr: false` and a pulse skeleton as loading fallback.
+- `next/image` for every image with accurate `sizes`; `priority` only above the fold
+- Never render per-element motion components for large decorative grids — prefer CSS/SVG
+- Above-the-fold content must not depend on JS to become visible
+- Autoplay timers and animation loops pause when unseen (`useIsActive`) and under reduced motion
+- Keep source photos ≤2048px (run `scripts/optimize-images.sh`)
 
 ## Code Conventions
 
-- `'use client'` only when needed (state, effects, event handlers)
-- `const` arrow functions, not `function` declarations
-- Event handlers prefixed with `handle` (e.g., `handleClick`, `handleSubmit`)
-- TypeScript interfaces/types for all props and data structures
-- `cn()` for conditional class merging — never inline styles or `<style>` tags
-- Early returns to reduce nesting
-
-## SEO Metadata Template
-
-```typescript
-export const metadata: Metadata = {
-  title: "Adam's Staycation | Luxury Condo Rental at Tambuli Seaside Living, Cebu",
-  description: 'Book your luxury staycation at Tambuli Seaside Living in Lapu-Lapu City, Cebu.',
-  openGraph: {
-    title: "Adam's Staycation | Luxury Cebu Staycation",
-    description: 'Your luxury escape at Tambuli Seaside Living',
-    images: ['/og-image.png'],
-    url: 'https://adamstaycation.business',
-    type: 'website',
-  },
-}
-```
+- `'use client'` only when needed (state, effects, event handlers); sections without hooks stay server components
+- `const` arrow components and functions, not `function` declarations (vendored `components/ui` excepted)
+- Event handlers prefixed with `handle`
+- TypeScript interfaces/types for props and data
+- `cn()` for conditional classes — no inline styles except dynamic values (transforms, animation timing)
+- Early returns over nesting; no dead code — remove unused components, exports, CSS and dependencies
+- Comments: at most one line, only for non-obvious *why*
 
 ## Accessibility
 
-- All interactive elements need `aria-label`, visible focus states (`focus:` utilities), and `onKeyDown` alongside `onClick`
-- Semantic HTML: `<section>`, `<article>`, `<nav>`, `<header>`, `<footer>`
-- `next/image` for all images with descriptive `alt` text, `width`, `height`, `priority` on above-the-fold images
-- Respect `prefers-reduced-motion` by zeroing out animation durations when matched
+- Native `<button>`/`<a>` for interactions (no duplicate key handlers needed); `onKeyDown` only for custom widgets (e.g. tablists)
+- Visible focus styles (`focus-visible:ring-*`), `aria-label` on icon-only controls, touch targets ≥44px
+- Semantic HTML: one `<h1>` (hero), sequential headings, `<main id="main">` with skip link
+- `next/image` with descriptive `alt` (empty for decorative)
+- Respect `prefers-reduced-motion` (CSS `motion-reduce:`, `MotionProvider`, `usePrefersReducedMotion`)
