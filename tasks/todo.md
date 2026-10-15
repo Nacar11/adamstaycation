@@ -25,14 +25,17 @@ See `tasks/plan.md` for the description, acceptance criteria and verification fo
 > Checkpoint 3 Lighthouse (desktop, local prod build): SEO 100 · A11y 97 (contrast → T12) · Best Practices 96 (only the local-only `/_vercel/insights` 404) · Performance 71 (TBT 460 ms, LCP 1.9 s, CLS 0)
 
 ## Phase 4: Accessibility and runtime
-- [ ] T9: Reduced motion everywhere (`MotionConfig`, autoplay, zoom effect, particles, smooth scroll) (M)
-- [ ] T10: Hero slideshow pause/play control (WCAG 2.2.2) (S)
-- [ ] T11: `useIsActive`: pause hero, resort and particles when off-screen or the tab is hidden (M)
-- [ ] T12: Raise low-contrast labels to WCAG AA (S)
-- [ ] T13: Skip link + roving-tabindex gallery tabs (M)
-- [ ] T14: `min-h-screen` → `min-h-svh` (XS)
-- [ ] T17: Fullscreen gallery lightbox (native `<dialog>`, keys, swipe, focus return, preloading) (M)
-- [ ] ✅ Checkpoint 4: Lighthouse A11y ≥ 95, keyboard and reduced-motion scripts pass, review, push
+- [x] T9: Reduced motion everywhere (`MotionConfig`, autoplay, zoom effect, particles, smooth scroll) (M)
+- [x] T10: Hero slideshow pause/play control (WCAG 2.2.2) (S)
+- [x] T11: `useIsActive`: pause hero, resort and particles when off-screen or the tab is hidden (M)
+- [x] T12: Raise low-contrast labels to WCAG AA (S)
+- [x] T13: Skip link + roving-tabindex gallery tabs (M)
+- [x] T14: `min-h-screen` → `min-h-svh` (XS)
+- [x] T17: Fullscreen gallery lightbox (native `<dialog>`, keys, swipe, focus return, preloading) (M)
+- [x] ✅ Checkpoint 4: Lighthouse A11y ≥ 95, keyboard and reduced-motion scripts pass, review, push
+
+> Checkpoint 4 extras (found while measuring): DotPattern rendered ~4,600 motion circles (-> one SVG pattern, desktop TBT 500 -> 0 ms); TextAnimate remounted on every hero render (memoized); hero reveals moved to CSS so LCP text paints without JS.
+> Checkpoint 4 Lighthouse (local prod build): Desktop Perf 95 · A11y 100 · BP 96* · SEO 100 — Mobile (devtools throttling) Perf 98, LCP 2.1 s; (simulated) Perf 85. *only local-only /_vercel/insights 404
 
 ## Phase 5: Maintainability and monitoring
 - [ ] T15: Replace hard-coded hex with tokens; gallery active pill and thumbnail ring → rust (Q3 = B) (S)
