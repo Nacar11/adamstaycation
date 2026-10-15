@@ -755,24 +755,27 @@ export default function ExperienceSection() {
                         <div className="absolute inset-y-0 left-0 w-10 md:w-20 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
                         <div className="absolute inset-y-0 right-0 w-10 md:w-20 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
 
-                        <div
-                            className="flex flex-nowrap gap-0 overflow-x-auto px-5 md:px-10 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]"
-                            role="list"
-                            aria-label="Included amenities"
-                        >
-                            {allAmenities.map((amenity) => {
-                                const Icon = amenity.icon
-                                return (
-                                    <div
-                                        key={amenity.title}
-                                        role="listitem"
-                                        className="flex-shrink-0 flex items-center gap-2 mx-2 px-4 py-2 rounded-full bg-sand-light border border-sand-dark/20 hover:bg-sand hover:border-sand-dark/35 transition-all duration-200 cursor-default"
-                                    >
-                                        <Icon className="w-3.5 h-3.5 flex-shrink-0 text-coral/70" strokeWidth={1.5} aria-hidden="true" />
-                                        <span className="text-xs font-medium tracking-wide whitespace-nowrap text-ocean/70">{amenity.title}</span>
-                                    </div>
-                                )
-                            })}
+                        <div className="overflow-x-auto px-5 md:px-10 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
+                            {/* w-max + mx-auto: centred when the row fits, scrolls from the first pill when it doesn't */}
+                            <div
+                                className="flex flex-nowrap gap-0 w-max mx-auto"
+                                role="list"
+                                aria-label="Included amenities"
+                            >
+                                {allAmenities.map((amenity) => {
+                                    const Icon = amenity.icon
+                                    return (
+                                        <div
+                                            key={amenity.title}
+                                            role="listitem"
+                                            className="flex-shrink-0 flex items-center gap-2 mx-2 px-4 py-2 rounded-full bg-sand-light border border-sand-dark/20 hover:bg-sand hover:border-sand-dark/35 transition-all duration-200 cursor-default"
+                                        >
+                                            <Icon className="w-3.5 h-3.5 flex-shrink-0 text-coral/70" strokeWidth={1.5} aria-hidden="true" />
+                                            <span className="text-xs font-medium tracking-wide whitespace-nowrap text-ocean/70">{amenity.title}</span>
+                                        </div>
+                                    )
+                                })}
+                            </div>
                         </div>
                     </div>
 
