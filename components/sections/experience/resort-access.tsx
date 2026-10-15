@@ -9,6 +9,7 @@ import { BlurFade } from '@/components/ui/blur-fade'
 import { ImageShimmer } from '@/components/ui/image-shimmer'
 import { cn } from '@/lib/utils'
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion'
+import { useIsActive } from '@/lib/hooks/use-is-active'
 import { preloadImage } from '@/lib/preload-image'
 import { useImageReadiness } from '@/lib/hooks/use-image-readiness'
 import { resortAccessImages } from './data'
@@ -43,17 +44,19 @@ const ResortAccess = () => {
         })
     }, [loadedRef])
 
-    // Reduced motion: no autoplay — visitors step through with the arrows instead
-    const prefersReducedMotion = usePrefersReducedMotion()
-
-    useEffect(() => {
-        if (resortHovered || prefersReducedMotion) return
-        const interval = setInterval(handleResortAutoplay, RESORT_AUTOPLAY_INTERVAL)
-        return () => clearInterval(interval)
-    }, [handleResortAutoplay, resortHovered, prefersReducedMotion])
-
     // Warm every slide, in order, once the carousel approaches the viewport
     const resortRef = useRef<HTMLDivElement>(null)
+
+    // Reduced motion: no autoplay — visitors step through with the arrows instead.
+    // Off-screen or hidden tab: no autoplay either, so nothing ticks unseen.
+    const prefersReducedMotion = usePrefersReducedMotion()
+    const isResortActive = useIsActive(resortRef)
+
+    useEffect(() => {
+        if (resortHovered || prefersReducedMotion || !isResortActive) return
+        const interval = setInterval(handleResortAutoplay, RESORT_AUTOPLAY_INTERVAL)
+        return () => clearInterval(interval)
+    }, [handleResortAutoplay, resortHovered, prefersReducedMotion, isResortActive])
     const isResortNear = useInView(resortRef, { once: true, margin: NEAR_VIEWPORT_MARGIN })
 
     useEffect(() => {

@@ -1,39 +1,8 @@
 "use client"
 
-import React, {
-  ComponentPropsWithoutRef,
-  useEffect,
-  useRef,
-  useState,
-} from "react"
+import React, { ComponentPropsWithoutRef, useEffect, useRef } from "react"
 
 import { cn } from "@/lib/utils"
-
-interface MousePosition {
-  x: number
-  y: number
-}
-
-function MousePosition(): MousePosition {
-  const [mousePosition, setMousePosition] = useState<MousePosition>({
-    x: 0,
-    y: 0,
-  })
-
-  useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      setMousePosition({ x: event.clientX, y: event.clientY })
-    }
-
-    window.addEventListener("mousemove", handleMouseMove)
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove)
-    }
-  }, [])
-
-  return mousePosition
-}
 
 interface ParticlesProps extends ComponentPropsWithoutRef<"div"> {
   className?: string
@@ -45,6 +14,8 @@ interface ParticlesProps extends ComponentPropsWithoutRef<"div"> {
   color?: string
   vx?: number
   vy?: number
+  /** Stops the animation loop (e.g. while off-screen or the tab is hidden) */
+  paused?: boolean
 }
 
 function hexToRgb(hex: string): number[] {
@@ -87,13 +58,13 @@ export const Particles: React.FC<ParticlesProps> = ({
   color = "#ffffff",
   vx = 0,
   vy = 0,
+  paused = false,
   ...props
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const canvasContainerRef = useRef<HTMLDivElement>(null)
   const context = useRef<CanvasRenderingContext2D | null>(null)
   const circles = useRef<Circle[]>([])
-  const mousePosition = MousePosition()
   const mouse = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
   const canvasSize = useRef<{ w: number; h: number }>({ w: 0, h: 0 })
   const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1
@@ -105,7 +76,7 @@ export const Particles: React.FC<ParticlesProps> = ({
       context.current = canvasRef.current.getContext("2d")
     }
     initCanvas()
-    animate()
+    if (!paused) animate()
 
     const handleResize = () => {
       if (resizeTimeout.current) {
@@ -127,33 +98,51 @@ export const Particles: React.FC<ParticlesProps> = ({
       }
       window.removeEventListener("resize", handleResize)
     }
+    // Set up once per colour; the draw helpers read live values through refs
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [color])
 
+  // Track the pointer in a ref — no React re-render on every mouse move
   useEffect(() => {
-    onMouseMove()
-  }, [mousePosition.x, mousePosition.y])
-
-  useEffect(() => {
-    initCanvas()
-  }, [refresh])
-
-  const initCanvas = () => {
-    resizeCanvas()
-    drawParticles()
-  }
-
-  const onMouseMove = () => {
-    if (canvasRef.current) {
+    const handleMouseMove = (event: MouseEvent) => {
+      if (!canvasRef.current) return
       const rect = canvasRef.current.getBoundingClientRect()
       const { w, h } = canvasSize.current
-      const x = mousePosition.x - rect.left - w / 2
-      const y = mousePosition.y - rect.top - h / 2
+      const x = event.clientX - rect.left - w / 2
+      const y = event.clientY - rect.top - h / 2
       const inside = x < w / 2 && x > -w / 2 && y < h / 2 && y > -h / 2
       if (inside) {
         mouse.current.x = x
         mouse.current.y = y
       }
     }
+
+    window.addEventListener("mousemove", handleMouseMove, { passive: true })
+    return () => window.removeEventListener("mousemove", handleMouseMove)
+  }, [])
+
+  // Pause/resume the animation loop without resetting the particles
+  useEffect(() => {
+    if (paused) {
+      if (rafID.current != null) {
+        window.cancelAnimationFrame(rafID.current)
+        rafID.current = null
+      }
+      return
+    }
+    if (rafID.current == null) animate()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paused])
+
+  useEffect(() => {
+    initCanvas()
+    // Re-seed only when the caller explicitly asks via `refresh`
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refresh])
+
+  const initCanvas = () => {
+    resizeCanvas()
+    drawParticles()
   }
 
   const resizeCanvas = () => {

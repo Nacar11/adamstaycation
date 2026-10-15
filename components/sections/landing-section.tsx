@@ -11,6 +11,7 @@ import { DotPattern } from '@/components/ui/dot-pattern'
 import { Particles } from '@/components/ui/particles'
 import { cn } from '@/lib/utils'
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion'
+import { useIsActive } from '@/lib/hooks/use-is-active'
 import PageLoader from '@/components/shared/page-loader'
 import { scrollToTarget } from '@/lib/scroll'
 import heroImage1 from '@/public/images/banner/landing-page-1.jpg'
@@ -84,19 +85,22 @@ export default function LandingSection() {
 
     // WCAG 2.2.2: visitors can pause the auto-advancing slideshow
     const [isPaused, setIsPaused] = useState(false)
-    const [resumeCount, setResumeCount] = useState(0)
-    const isSlideshowRunning = canAutoplay && !isPaused
+
+    // Off-screen or hidden tab: stop the slideshow timer and the particles loop
+    const heroRef = useRef<HTMLElement>(null)
+    const isHeroActive = useIsActive(heroRef)
+    const isSlideshowRunning = canAutoplay && !isPaused && isHeroActive
 
     const handleTogglePause = () => {
-        setIsPaused((paused) => {
-            // Resuming restarts the timer, so restart the progress bar with it
-            if (paused) setResumeCount((count) => count + 1)
-            return !paused
-        })
+        setIsPaused((paused) => !paused)
     }
+
+    // Each (re)start begins a fresh slide timer — `cycle` restarts the progress bar in step with it
+    const [cycle, setCycle] = useState(0)
 
     useEffect(() => {
         if (!isSlideshowRunning) return
+        setCycle((count) => count + 1)
         const interval = setInterval(advanceImage, SLIDE_DURATION)
         return () => clearInterval(interval)
     }, [advanceImage, isSlideshowRunning])
@@ -116,6 +120,7 @@ export default function LandingSection() {
         <>
             <PageLoader visible={isLoaderVisible} />
             <section
+                ref={heroRef}
                 id="home"
                 className="relative min-h-screen flex items-center justify-center overflow-hidden bg-ocean-deep"
                 aria-label="Welcome to Adam's Staycation"
@@ -161,6 +166,7 @@ export default function LandingSection() {
                 {/* Particles Background Effect — skipped entirely for reduced motion */}
                 {!prefersReducedMotion && (
                     <Particles
+                        paused={!isHeroActive}
                         className="absolute inset-0 z-[1]"
                         quantity={50}
                         staticity={30}
@@ -257,11 +263,11 @@ export default function LandingSection() {
                                 <div key={index} className="flex-1 h-[2px] bg-white/20 rounded-full overflow-hidden">
                                     {canAutoplay && index === currentImageIndex && (
                                         <div
-                                            key={`progress-${currentImageIndex}-${resumeCount}`}
+                                            key={`progress-${currentImageIndex}-${cycle}`}
                                             className="h-full bg-white/70 rounded-full origin-left"
                                             style={{
                                                 animation: `hero-progress ${SLIDE_DURATION}ms linear forwards`,
-                                                animationPlayState: isPaused ? 'paused' : 'running',
+                                                animationPlayState: isSlideshowRunning ? 'running' : 'paused',
                                             }}
                                         />
                                     )}
