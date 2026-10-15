@@ -8,6 +8,7 @@ export const ABOUT_GRID_SIZES = '(max-width: 1024px) 50vw, 25vw'
 export const RESORT_SIZES = '(max-width: 1024px) 100vw, 42vw'
 export const GALLERY_MAIN_SIZES = '(max-width: 1024px) 100vw, 1000px'
 export const GALLERY_THUMB_SIZES = '(max-width: 1024px) 80px, 185px'
+export const LIGHTBOX_SIZES = '100vw'
 
 // Preloading / autoplay cadence
 export const NEAR_VIEWPORT_MARGIN = '600px 0px'

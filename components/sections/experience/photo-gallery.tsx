@@ -11,6 +11,7 @@ import { preloadImage } from '@/lib/preload-image'
 import { useImageReadiness } from '@/lib/hooks/use-image-readiness'
 import { allCategories, galleryGroups, type GalleryCategory } from './data'
 import { GALLERY_PANEL_ID, GalleryCategoryPills, GalleryGroupTabs, galleryTabId } from './gallery-tabs'
+import GalleryLightbox from './gallery-lightbox'
 import {
     BASE_DELAY,
     GALLERY_MAIN_SIZES,
@@ -129,6 +130,17 @@ const PhotoGallery = () => {
         })
     }, [currentImageIndex, activeCategory])
 
+    // Fullscreen lightbox — shares the gallery's current index; focus returns to the photo on close
+    const [isLightboxOpen, setIsLightboxOpen] = useState(false)
+    const lightboxTriggerRef = useRef<HTMLButtonElement>(null)
+
+    const handleOpenLightbox = () => setIsLightboxOpen(true)
+
+    const handleCloseLightbox = useCallback(() => {
+        setIsLightboxOpen(false)
+        lightboxTriggerRef.current?.focus()
+    }, [])
+
     // Touch swipe for mobile gallery
     const touchStartX = useRef(0)
 
@@ -198,29 +210,39 @@ const PhotoGallery = () => {
                         >
                             <ImageShimmer visible={!isMainLoaded} />
 
-                            <AnimatePresence>
-                                <motion.div
-                                    key={`${activeCategory}-${currentImageIndex}`}
-                                    initial={{ opacity: 0, scale: 1.04 }}
-                                    animate={isMainLoaded ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 1.04 }}
-                                    exit={{ opacity: 0 }}
-                                    whileHover={{ scale: 1.04 }}
-                                    transition={{
-                                        opacity: { duration: 0.4, ease: 'easeOut' },
-                                        scale: { duration: 0.65, ease: 'easeOut', type: 'tween' },
-                                    }}
-                                    className="absolute inset-0 cursor-zoom-in"
-                                >
-                                    <Image
-                                        src={currentImage.src}
-                                        alt={currentImage.alt}
-                                        fill
-                                        sizes={GALLERY_MAIN_SIZES}
-                                        className="object-cover"
-                                        onLoad={() => markLoaded(`main:${currentImage.src}`)}
-                                    />
-                                </motion.div>
-                            </AnimatePresence>
+                            {/* The photo itself opens the fullscreen lightbox (arrows stay separate buttons) */}
+                            <button
+                                ref={lightboxTriggerRef}
+                                type="button"
+                                onClick={handleOpenLightbox}
+                                aria-label={`Open ${activeGallery.title} photo ${currentImageIndex + 1} of ${activeGallery.images.length} in full screen`}
+                                aria-haspopup="dialog"
+                                className="absolute inset-0 cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-rust"
+                            >
+                                <AnimatePresence>
+                                    <motion.div
+                                        key={`${activeCategory}-${currentImageIndex}`}
+                                        initial={{ opacity: 0, scale: 1.04 }}
+                                        animate={isMainLoaded ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 1.04 }}
+                                        exit={{ opacity: 0 }}
+                                        whileHover={{ scale: 1.04 }}
+                                        transition={{
+                                            opacity: { duration: 0.4, ease: 'easeOut' },
+                                            scale: { duration: 0.65, ease: 'easeOut', type: 'tween' },
+                                        }}
+                                        className="absolute inset-0"
+                                    >
+                                        <Image
+                                            src={currentImage.src}
+                                            alt={currentImage.alt}
+                                            fill
+                                            sizes={GALLERY_MAIN_SIZES}
+                                            className="object-cover"
+                                            onLoad={() => markLoaded(`main:${currentImage.src}`)}
+                                        />
+                                    </motion.div>
+                                </AnimatePresence>
+                            </button>
 
                             {/* Gradient scrim */}
                             <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent pointer-events-none" />
@@ -312,6 +334,15 @@ const PhotoGallery = () => {
                 </BlurFade>
 
             </div>
+
+            <GalleryLightbox
+                open={isLightboxOpen}
+                title={activeGallery.title}
+                images={activeGallery.images}
+                index={currentImageIndex}
+                onIndexChange={handleDotClick}
+                onClose={handleCloseLightbox}
+            />
         </div>
     )
 }
