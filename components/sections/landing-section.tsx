@@ -122,7 +122,7 @@ export default function LandingSection() {
             <section
                 ref={heroRef}
                 id="home"
-                className="relative min-h-screen flex items-center justify-center overflow-hidden bg-ocean-deep"
+                className="relative min-h-svh flex items-center justify-center overflow-hidden bg-ocean-deep"
                 aria-label="Welcome to Adam's Staycation"
             >
                 {/* Ken Burns Background Carousel */}

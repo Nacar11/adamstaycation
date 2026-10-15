@@ -16,7 +16,7 @@ export default function Home() {
             </a>
             <StructuredData />
             <Navbar />
-            <main id="main" tabIndex={-1} className="min-h-screen focus:outline-none">
+            <main id="main" tabIndex={-1} className="min-h-svh focus:outline-none">
                 <LandingSection />
                 <ExperienceSection />
                 <HostSection />
