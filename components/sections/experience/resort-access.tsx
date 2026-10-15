@@ -8,6 +8,7 @@ import { AIRBNB_LISTING_URL } from '@/lib/constants'
 import { BlurFade } from '@/components/ui/blur-fade'
 import { ImageShimmer } from '@/components/ui/image-shimmer'
 import { cn } from '@/lib/utils'
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion'
 import { preloadImage } from '@/lib/preload-image'
 import { useImageReadiness } from '@/lib/hooks/use-image-readiness'
 import { resortAccessImages } from './data'
@@ -42,11 +43,14 @@ const ResortAccess = () => {
         })
     }, [loadedRef])
 
+    // Reduced motion: no autoplay — visitors step through with the arrows instead
+    const prefersReducedMotion = usePrefersReducedMotion()
+
     useEffect(() => {
-        if (resortHovered) return
+        if (resortHovered || prefersReducedMotion) return
         const interval = setInterval(handleResortAutoplay, RESORT_AUTOPLAY_INTERVAL)
         return () => clearInterval(interval)
-    }, [handleResortAutoplay, resortHovered])
+    }, [handleResortAutoplay, resortHovered, prefersReducedMotion])
 
     // Warm every slide, in order, once the carousel approaches the viewport
     const resortRef = useRef<HTMLDivElement>(null)
@@ -77,7 +81,7 @@ const ResortAccess = () => {
                     >
                         {/* Slides track */}
                         <div
-                            className="absolute inset-0 flex transition-transform duration-700 ease-out"
+                            className="absolute inset-0 flex transition-transform duration-700 ease-out motion-reduce:transition-none"
                             style={{ transform: `translateX(-${resortIndex * 100}%)` }}
                         >
                             {resortAccessImages.map((img) => (

@@ -10,7 +10,9 @@ import { ShimmerButton } from '@/components/ui/shimmer-button'
 import { DotPattern } from '@/components/ui/dot-pattern'
 import { Particles } from '@/components/ui/particles'
 import { cn } from '@/lib/utils'
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion'
 import PageLoader from '@/components/shared/page-loader'
+import { scrollToTarget } from '@/lib/scroll'
 import heroImage1 from '@/public/images/banner/landing-page-1.jpg'
 import heroImage2 from '@/public/images/banner/landing-page-2.jpg'
 import heroImage3 from '@/public/images/banner/landing-page-3.jpg'
@@ -75,18 +77,19 @@ export default function LandingSection() {
         setCurrentImageIndex((prev) => (prev + 1) % heroImages.length)
     }, [])
 
-    // Start the slideshow only once every slide is ready, so it never crossfades into a blurry placeholder
+    // Start the slideshow only once every slide is ready, so it never crossfades into a blurry placeholder.
+    // Reduced motion: hold on the first photo (no autoplay, no Ken Burns zoom, no particles).
+    const prefersReducedMotion = usePrefersReducedMotion()
+    const isSlideshowRunning = areAllImagesSettled && !prefersReducedMotion
+
     useEffect(() => {
-        if (!areAllImagesSettled) return
+        if (!isSlideshowRunning) return
         const interval = setInterval(advanceImage, SLIDE_DURATION)
         return () => clearInterval(interval)
-    }, [advanceImage, areAllImagesSettled])
+    }, [advanceImage, isSlideshowRunning])
 
     const scrollToSection = (id: string) => {
-        const element = document.getElementById(id)
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth' })
-        }
+        scrollToTarget(id)
     }
 
     const handleKeyDown = (e: React.KeyboardEvent, id: string) => {
@@ -125,7 +128,7 @@ export default function LandingSection() {
                                 className="object-cover will-change-transform"
                                 style={{
                                     transformOrigin: img.origin,
-                                    transform: index === currentImageIndex ? 'scale(1.15)' : 'scale(1)',
+                                    transform: index === currentImageIndex && !prefersReducedMotion ? 'scale(1.15)' : 'scale(1)',
                                     transition: index === currentImageIndex
                                         ? `transform ${SLIDE_DURATION + 1500}ms ease-out`
                                         : 'transform 1.5s ease-in-out',
@@ -142,14 +145,16 @@ export default function LandingSection() {
                     />
                 </div>
     
-                {/* Particles Background Effect */}
-                <Particles
-                    className="absolute inset-0 z-[1]"
-                    quantity={50}
-                    staticity={30}
-                    ease={50}
-                    color="#ffffff"
-                />
+                {/* Particles Background Effect — skipped entirely for reduced motion */}
+                {!prefersReducedMotion && (
+                    <Particles
+                        className="absolute inset-0 z-[1]"
+                        quantity={50}
+                        staticity={30}
+                        ease={50}
+                        color="#ffffff"
+                    />
+                )}
     
                 {/* Dot Pattern Overlay */}
                 <DotPattern
@@ -236,7 +241,7 @@ export default function LandingSection() {
                     <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-10 flex gap-2 w-48">
                         {heroImages.map((_, index) => (
                             <div key={index} className="flex-1 h-[2px] bg-white/20 rounded-full overflow-hidden">
-                                {areAllImagesSettled && index === currentImageIndex && (
+                                {isSlideshowRunning && index === currentImageIndex && (
                                     <div
                                         key={`progress-${currentImageIndex}`}
                                         className="h-full bg-white/70 rounded-full origin-left"

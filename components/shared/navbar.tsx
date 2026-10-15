@@ -6,6 +6,7 @@ import { Menu, X } from 'lucide-react'
 import { AIRBNB_LISTING_URL } from '@/lib/constants'
 import { ShimmerButton } from '@/components/ui/shimmer-button'
 import { cn } from '@/lib/utils'
+import { scrollToTarget } from '@/lib/scroll'
 
 interface NavLink {
     href: string
@@ -33,21 +34,13 @@ export default function Navbar() {
 
     const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
         e.preventDefault()
-        const element = document.querySelector(href)
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth' })
-            setIsMobileMenuOpen(false)
-        }
+        if (scrollToTarget(href)) setIsMobileMenuOpen(false)
     }
 
     const handleKeyDown = (e: React.KeyboardEvent, href: string) => {
         if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault()
-            const element = document.querySelector(href)
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth' })
-                setIsMobileMenuOpen(false)
-            }
+            if (scrollToTarget(href)) setIsMobileMenuOpen(false)
         }
     }
 
