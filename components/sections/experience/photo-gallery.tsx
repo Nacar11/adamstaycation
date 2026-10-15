@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 import { preloadImage } from '@/lib/preload-image'
 import { useImageReadiness } from '@/lib/hooks/use-image-readiness'
 import { allCategories, galleryGroups, type GalleryCategory } from './data'
+import { GALLERY_PANEL_ID, GalleryCategoryPills, GalleryGroupTabs, galleryTabId } from './gallery-tabs'
 import {
     BASE_DELAY,
     GALLERY_MAIN_SIZES,
@@ -160,70 +161,24 @@ const PhotoGallery = () => {
                             </h2>
 
                             {/* Group toggle — right-aligned */}
-                            <div
-                                className="inline-flex self-start sm:self-auto bg-white border border-sand-dark/15 rounded-xl p-1 shadow-sm flex-shrink-0"
-                                role="tablist"
-                                aria-label="Gallery groups"
-                            >
-                                {galleryGroups.map((group) => (
-                                    <motion.button
-                                        key={group.id}
-                                        onClick={() => handleGroupChange(group.id)}
-                                        onPointerEnter={() => handlePrefetchGroup(group.id)}
-                                        onFocus={() => handlePrefetchGroup(group.id)}
-                                        role="tab"
-                                        aria-selected={activeGroupId === group.id}
-                                        whileTap={{ scale: 0.95 }}
-                                        transition={{ duration: 0.1, ease: 'easeOut' }}
-                                        className={cn(
-                                            "px-5 py-2.5 min-h-[44px] flex items-center rounded-lg text-sm font-semibold transition-all duration-250 cursor-pointer",
-                                            activeGroupId === group.id
-                                                ? "bg-ocean-deep text-white shadow-md"
-                                                : "text-ocean/75 hover:text-ocean"
-                                        )}
-                                    >
-                                        {group.title}
-                                    </motion.button>
-                                ))}
-                            </div>
+                            <GalleryGroupTabs
+                                groups={galleryGroups}
+                                activeGroupId={activeGroupId}
+                                onSelect={handleGroupChange}
+                                onPrefetch={handlePrefetchGroup}
+                            />
                         </div>
                     </div>
                 </BlurFade>
 
                 {/* Category pills — left-aligned, light style */}
                 <BlurFade delay={BASE_DELAY + STAGGER_DELAY} inView>
-                    <div
-                        className="flex flex-wrap gap-2 mb-8"
-                        role="tablist"
-                        aria-label="Gallery categories"
-                    >
-                        <AnimatePresence mode="popLayout">
-                            {activeGroup.categories.map((category) => (
-                                <motion.button
-                                    key={category.id}
-                                    layout
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.9 }}
-                                    whileTap={{ scale: 0.92 }}
-                                    transition={{ duration: 0.2, ease: 'easeOut' }}
-                                    onClick={() => setActiveCategory(category.id)}
-                                    onPointerEnter={() => prefetchCategory(category)}
-                                    onFocus={() => prefetchCategory(category)}
-                                    role="tab"
-                                    aria-selected={activeCategory === category.id}
-                                    className={cn(
-                                        "px-4 py-2.5 min-h-[44px] flex items-center rounded-full text-xs font-medium cursor-pointer transition-colors duration-200",
-                                        activeCategory === category.id
-                                            ? "bg-rust text-white shadow-sm shadow-rust/20"
-                                            : "bg-white text-ocean/75 hover:text-ocean border border-sand-dark/15 hover:border-sand-dark/30"
-                                    )}
-                                >
-                                    {category.title}
-                                </motion.button>
-                            ))}
-                        </AnimatePresence>
-                    </div>
+                    <GalleryCategoryPills
+                        categories={activeGroup.categories}
+                        activeCategoryId={activeCategory}
+                        onSelect={setActiveCategory}
+                        onPrefetch={prefetchCategory}
+                    />
                 </BlurFade>
 
                 {/* Gallery — main image + thumbnail strip */}
@@ -232,8 +187,8 @@ const PhotoGallery = () => {
                         ref={galleryRef}
                         className="grid grid-cols-1 lg:grid-cols-[1fr_185px] gap-3"
                         role="tabpanel"
-                        id={`gallery-panel-${activeCategory}`}
-                        aria-label={`${activeGallery.title} gallery`}
+                        id={GALLERY_PANEL_ID}
+                        aria-labelledby={galleryTabId(activeGallery.id)}
                     >
                         {/* Main image */}
                         <div
