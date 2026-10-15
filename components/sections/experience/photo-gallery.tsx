@@ -273,9 +273,9 @@ const PhotoGallery = () => {
                             {/* Image caption + counter */}
                             <div className="absolute bottom-0 left-0 right-0 px-5 py-4 flex items-end justify-between pointer-events-none">
                                 <div>
-                                    <h4 className="text-white font-semibold text-sm drop-shadow mb-0.5">
+                                    <p className="text-white font-semibold text-sm drop-shadow mb-0.5">
                                         {activeGallery.title}
-                                    </h4>
+                                    </p>
                                     <p className="text-white/65 text-xs hidden md:block drop-shadow leading-snug">
                                         {activeGallery.description}
                                     </p>

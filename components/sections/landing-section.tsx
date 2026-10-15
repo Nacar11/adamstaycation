@@ -171,6 +171,7 @@ export default function LandingSection() {
                         {/* Animated Title */}
                         <BlurFade delay={BASE_DELAY} inView>
                             <TextAnimate
+                                as="h1"
                                 animation="blurInUp"
                                 by="character"
                                 className="font-display text-[2.6rem] md:text-7xl lg:text-8xl text-white mb-6 tracking-tight whitespace-nowrap"
