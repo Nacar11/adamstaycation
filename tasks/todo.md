@@ -16,11 +16,13 @@ See `tasks/plan.md` for the description, acceptance criteria and verification fo
 - [x] ✅ Checkpoint 2: screenshots match, behaviour scripts pass, review, push
 
 ## Phase 3: SEO and asset weight
-- [ ] T5: Hero `<h1>` + heading order (XS)
-- [ ] T6: `metadataBase`, OG/Twitter image, canonical, viewport, `sitemap.ts`, `robots.ts` for `https://adamstaycation.business` (M)
-- [ ] T7: JSON-LD `VacationRental` structured data (S)
-- [ ] T8: Compress original photos with `sips` (long edge 2560px, quality about 80; keep the `.mp4`) (M)
-- [ ] ✅ Checkpoint 3: Lighthouse SEO ≥ 95, image weight target met, review, push
+- [x] T5: Hero `<h1>` + heading order (XS)
+- [x] T6: `metadataBase`, OG/Twitter image, canonical, viewport, `sitemap.ts`, `robots.ts` for `https://adamstaycation.business` (M)
+- [x] T7: JSON-LD `VacationRental` structured data (S)
+- [x] T8: Compress original photos with `sips` (long edge 2560px, quality about 80; keep the `.mp4`) (M)
+- [x] ✅ Checkpoint 3: Lighthouse SEO ≥ 95, image weight target met, review, push
+
+> Checkpoint 3 Lighthouse (desktop, local prod build): SEO 100 · A11y 97 (contrast → T12) · Best Practices 96 (only the local-only `/_vercel/insights` 404) · Performance 71 (TBT 460 ms, LCP 1.9 s, CLS 0)
 
 ## Phase 4: Accessibility and runtime
 - [ ] T9: Reduced motion everywhere (`MotionConfig`, autoplay, zoom effect, particles, smooth scroll) (M)
