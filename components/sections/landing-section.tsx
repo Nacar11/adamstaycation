@@ -13,6 +13,7 @@ import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion'
 import { useIsActive } from '@/lib/hooks/use-is-active'
 import PageLoader from '@/components/shared/page-loader'
 import { scrollToTarget } from '@/lib/scroll'
+import { CTA_GRADIENT, CTA_SHIMMER } from '@/lib/theme'
 import heroImage1 from '@/public/images/banner/landing-page-1.jpg'
 import heroImage2 from '@/public/images/banner/landing-page-2.jpg'
 import heroImage3 from '@/public/images/banner/landing-page-3.jpg'
@@ -154,12 +155,7 @@ export default function LandingSection() {
                         </div>
                     ))}
                     {/* Gradient overlay */}
-                    <div
-                        className="absolute inset-0"
-                        style={{
-                            background: 'linear-gradient(to bottom, rgba(13, 43, 51, 0.45), rgba(13, 43, 51, 0.75))',
-                        }}
-                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-ocean-deep/45 to-ocean-deep/75" />
                 </div>
     
                 {/* Particles Background Effect — skipped entirely for reduced motion */}
@@ -170,7 +166,6 @@ export default function LandingSection() {
                         quantity={50}
                         staticity={30}
                         ease={50}
-                        color="#ffffff"
                     />
                 )}
     
@@ -230,9 +225,9 @@ export default function LandingSection() {
                                 >
                                     <ShimmerButton
                                         className="h-14 px-8 text-lg font-medium"
-                                        shimmerColor="rgba(255, 255, 255, 0.2)"
+                                        shimmerColor={CTA_SHIMMER}
                                         shimmerSize="0.1em"
-                                        background="linear-gradient(135deg, #E07A5F 0%, #c96a52 100%)"
+                                        background={CTA_GRADIENT}
                                     >
                                         <span className="whitespace-pre-wrap text-center leading-none tracking-tight text-white">
                                             Book on Airbnb

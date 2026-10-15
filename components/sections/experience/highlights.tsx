@@ -2,8 +2,14 @@ import Image from 'next/image'
 import { Camera } from 'lucide-react'
 import { BlurFade } from '@/components/ui/blur-fade'
 import { cn } from '@/lib/utils'
-import { featuredHighlights } from './data'
+import { featuredHighlights, type FeaturedHighlight } from './data'
 import { BASE_DELAY, HIGHLIGHT_SIZES, STAGGER_DELAY } from './constants'
+
+// Full class strings so Tailwind can see them
+const ACCENT_BAR_CLASS: Record<FeaturedHighlight['accent'], string> = {
+    ocean: 'bg-ocean',
+    coral: 'bg-coral',
+}
 
 // Experience intro + 2×2 full-bleed highlight cards
 const ExperienceHighlights = () => (
@@ -60,10 +66,7 @@ const ExperienceHighlights = () => (
                                 )}
 
                                 {/* Accent underline */}
-                                <div
-                                    className="absolute bottom-0 left-0 right-0 h-[3px]"
-                                    style={{ backgroundColor: highlight.accentColor }}
-                                />
+                                <div className={cn("absolute bottom-0 left-0 right-0 h-[3px]", ACCENT_BAR_CLASS[highlight.accent])} />
 
                                 {/* Text content */}
                                 <div className="absolute bottom-0 left-0 right-0 p-7 md:p-8">

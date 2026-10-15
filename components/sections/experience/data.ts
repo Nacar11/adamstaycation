@@ -19,7 +19,7 @@ export interface FeaturedHighlight {
     image: string
     title: string
     description: string
-    accentColor: string
+    accent: 'ocean' | 'coral'
 }
 
 export interface Amenity {
@@ -61,25 +61,25 @@ export const featuredHighlights: FeaturedHighlight[] = [
         image: '/images/experience/pool-beach-access.jpg',
         title: 'Pool & Beach Access',
         description: 'Multiple resort pools and private beach',
-        accentColor: '#1E4D5C'
+        accent: 'ocean'
     },
     {
         image: '/images/experience/luxury-amneties.jpg',
         title: 'Luxury Amenities',
         description: 'Fully equipped modern studio',
-        accentColor: '#E07A5F'
+        accent: 'coral'
     },
     {
         image: '/images/experience/resort-living.jpg',
         title: 'Resort Living',
         description: '11-hectare seaside community',
-        accentColor: '#1E4D5C'
+        accent: 'ocean'
     },
     {
         image: '/images/experience/gym-access.jpg',
         title: 'Gym & Fitness',
         description: 'State-of-the-art fitness facilities',
-        accentColor: '#E07A5F'
+        accent: 'coral'
     }
 ]
 

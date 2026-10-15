@@ -18,7 +18,10 @@ module.exports = {
   				DEFAULT: '#1E4D5C',
   				deep: '#0D2B33'
   			},
-  			coral: '#E07A5F',
+  			coral: {
+  				DEFAULT: '#E07A5F',
+  				dark: '#C96A52'
+  			},
   			rust: {
   				DEFAULT: '#A8472A',
   				dark: '#8C3A22'

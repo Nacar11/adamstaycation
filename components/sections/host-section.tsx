@@ -5,6 +5,7 @@ import { ArrowRight, ArrowUpRight, Mail, Phone, MapPin, type LucideIcon } from '
 import { AIRBNB_LISTING_URL, CONTACT_EMAIL, MAPS_URL } from '@/lib/constants'
 import { BlurFade } from '@/components/ui/blur-fade'
 import { ShimmerButton } from '@/components/ui/shimmer-button'
+import { RUST_CTA_SHIMMER } from '@/lib/theme'
 
 const STAGGER_DELAY = 0.1
 const BASE_DELAY = 0.2
@@ -137,7 +138,7 @@ export default function HostSection() {
                                 >
                                     <ShimmerButton
                                         className="h-12 px-7 text-[15px] font-semibold border-transparent hover:brightness-110 transition-[filter] duration-200"
-                                        shimmerColor="rgba(240, 169, 140, 0.35)"
+                                        shimmerColor={RUST_CTA_SHIMMER}
                                         shimmerSize="0.08em"
                                         background="var(--rust)"
                                         tabIndex={-1}

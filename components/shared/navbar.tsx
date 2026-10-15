@@ -7,6 +7,7 @@ import { AIRBNB_LISTING_URL } from '@/lib/constants'
 import { ShimmerButton } from '@/components/ui/shimmer-button'
 import { cn } from '@/lib/utils'
 import { scrollToTarget } from '@/lib/scroll'
+import { CTA_GRADIENT, CTA_SHIMMER } from '@/lib/theme'
 
 interface NavLink {
     href: string
@@ -101,9 +102,9 @@ export default function Navbar() {
                         >
                             <ShimmerButton
                                 className="h-10 px-6 text-sm font-medium"
-                                shimmerColor="rgba(255, 255, 255, 0.2)"
+                                shimmerColor={CTA_SHIMMER}
                                 shimmerSize="0.08em"
-                                background="linear-gradient(135deg, #E07A5F 0%, #c96a52 100%)"
+                                background={CTA_GRADIENT}
                             >
                                 <span className="text-white">Book Now</span>
                             </ShimmerButton>
@@ -182,9 +183,9 @@ export default function Navbar() {
                                     >
                                         <ShimmerButton
                                             className="w-full h-14 text-base font-medium"
-                                            shimmerColor="rgba(255, 255, 255, 0.2)"
+                                            shimmerColor={CTA_SHIMMER}
                                             shimmerSize="0.1em"
-                                            background="linear-gradient(135deg, #E07A5F 0%, #c96a52 100%)"
+                                            background={CTA_GRADIENT}
                                         >
                                             <span className="text-white">Book on Airbnb</span>
                                         </ShimmerButton>

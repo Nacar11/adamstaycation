@@ -306,9 +306,9 @@ const PhotoGallery = () => {
                                         className={cn(
                                             "relative flex-shrink-0 w-20 h-14 lg:w-full lg:h-auto lg:aspect-[4/3]",
                                             "rounded-xl overflow-hidden cursor-pointer transition-all duration-200 bg-sand",
-                                            "focus:outline-none focus:ring-2 focus:ring-coral focus:ring-offset-2 focus:ring-offset-white",
+                                            "focus:outline-none focus-visible:ring-2 focus-visible:ring-rust focus-visible:ring-offset-2 focus-visible:ring-offset-white",
                                             i === currentImageIndex
-                                                ? "ring-2 ring-coral ring-offset-2 ring-offset-white opacity-100"
+                                                ? "ring-2 ring-rust ring-offset-2 ring-offset-white opacity-100"
                                                 : "opacity-50 hover:opacity-85"
                                         )}
                                     >
