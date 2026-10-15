@@ -1,6 +1,6 @@
 "use client"
 
-import { ElementType, memo } from "react"
+import { ElementType, memo, useMemo } from "react"
 import { AnimatePresence, motion, MotionProps, Variants } from "motion/react"
 
 import { cn } from "@/lib/utils"
@@ -317,7 +317,9 @@ const TextAnimateBase = ({
   accessible = true,
   ...props
 }: TextAnimateProps) => {
-  const MotionComponent = motion.create(Component)
+  // Create the motion wrapper once per element type — calling motion.create on every
+  // render makes a new component type, so React would remount the whole text each time
+  const MotionComponent = useMemo(() => motion.create(Component), [Component])
 
   let segments: string[] = []
   switch (by) {

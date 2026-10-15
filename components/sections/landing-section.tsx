@@ -198,8 +198,7 @@ export default function LandingSection() {
                                 as="h1"
                                 animation="blurInUp"
                                 by="character"
-                                className="font-display text-[2.6rem] md:text-7xl lg:text-8xl text-white mb-6 tracking-tight whitespace-nowrap"
-                                style={{ textShadow: '2px 4px 8px rgba(0,0,0,0.3)' }}
+                                className="font-display text-[2.6rem] md:text-7xl lg:text-8xl text-white mb-6 tracking-tight whitespace-nowrap [text-shadow:2px_4px_8px_rgba(0,0,0,0.3)]"
                             >
                                 Adam&apos;s Staycation
                             </TextAnimate>
