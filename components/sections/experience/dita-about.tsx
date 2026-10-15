@@ -117,9 +117,7 @@ const DitaAbout = () => {
                                                 <Icon className="w-4 h-4 text-coral flex-shrink-0" strokeWidth={1.5} aria-hidden="true" />
                                                 <div>
                                                     <p className="font-display text-white text-2xl font-bold leading-none">
-                                                        {spec.numericValue ? (
-                                                            <NumberTicker value={spec.numericValue} className="text-white" />
-                                                        ) : spec.value}
+                                                        <NumberTicker value={spec.value} className="text-white" />
                                                     </p>
                                                     <p className="text-white/55 text-[11px] mt-0.5 tracking-wide">{spec.label}</p>
                                                 </div>

@@ -69,18 +69,18 @@ export const viewport: Viewport = {
     themeColor: THEME_COLOR,
 }
 
-export default function RootLayout({
-    children,
-}: {
+interface RootLayoutProps {
     children: React.ReactNode
-}) {
-    return (
-        <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
-            <body className="font-sans antialiased">
-                <MotionProvider>{children}</MotionProvider>
-                <Analytics />
-                <SpeedInsights />
-            </body>
-        </html>
-    )
 }
+
+const RootLayout = ({ children }: RootLayoutProps) => (
+    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
+        <body className="font-sans antialiased">
+            <MotionProvider>{children}</MotionProvider>
+            <Analytics />
+            <SpeedInsights />
+        </body>
+    </html>
+)
+
+export default RootLayout

@@ -8,7 +8,6 @@ import { TextAnimate } from '@/components/ui/text-animate'
 import { ShimmerButton } from '@/components/ui/shimmer-button'
 import { DotPattern } from '@/components/ui/dot-pattern'
 import { Particles } from '@/components/ui/particles'
-import { cn } from '@/lib/utils'
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion'
 import { useIsActive } from '@/lib/hooks/use-is-active'
 import PageLoader from '@/components/shared/page-loader'
@@ -33,7 +32,7 @@ const heroImages = [
     { image: heroImage3, origin: '40% 70%' },
 ]
 
-export default function LandingSection() {
+const LandingSection = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
     const [loadedCount, setLoadedCount] = useState(0)
     const [isFirstImageLoaded, setIsFirstImageLoaded] = useState(false)
@@ -105,16 +104,7 @@ export default function LandingSection() {
         return () => clearInterval(interval)
     }, [advanceImage, isSlideshowRunning])
 
-    const scrollToSection = (id: string) => {
-        scrollToTarget(id)
-    }
-
-    const handleKeyDown = (e: React.KeyboardEvent, id: string) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            scrollToSection(id)
-        }
-    }
+    const handleExplore = () => scrollToTarget('experience')
 
     return (
         <>
@@ -170,15 +160,7 @@ export default function LandingSection() {
                 )}
     
                 {/* Dot Pattern Overlay */}
-                <DotPattern
-                    className={cn(
-                        "absolute inset-0 z-[2] opacity-20",
-                        "[mask-image:radial-gradient(600px_circle_at_center,white,transparent)]"
-                    )}
-                    cr={1}
-                    cx={1}
-                    cy={1}
-                />
+                <DotPattern className="z-[2] opacity-20 [mask-image:radial-gradient(600px_circle_at_center,white,transparent)]" />
     
                 {/* Decorative Elements */}
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-sand-light/30 z-[3]" />
@@ -237,9 +219,8 @@ export default function LandingSection() {
         
                                 {/* Secondary CTA */}
                                 <button
-                                    onClick={() => scrollToSection('experience')}
-                                    onKeyDown={(e) => handleKeyDown(e, 'experience')}
-                                    tabIndex={0}
+                                    type="button"
+                                    onClick={handleExplore}
                                     className="px-8 py-4 glass-effect text-white text-lg font-medium rounded-full transition-all duration-300 hover:bg-white/20 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-transparent"
                                     aria-label="Explore amenities section"
                                 >
@@ -285,22 +266,19 @@ export default function LandingSection() {
         
                     {/* Scroll Indicator */}
                     <div className="animate-blur-fade-in motion-reduce:animate-none [animation-delay:740ms]">
-                        <div
-                            className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/70 flex flex-col items-center gap-2 cursor-pointer z-10"
-                            onClick={() => scrollToSection('experience')}
-                            onKeyDown={(e) => handleKeyDown(e, 'experience')}
-                            tabIndex={0}
-                            role="button"
-                            aria-label="Scroll to explore more content"
+                        <button
+                            type="button"
+                            onClick={handleExplore}
+                            className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/70 flex flex-col items-center gap-2 z-10 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
                         >
                             <span className="text-sm tracking-widest uppercase font-medium">Scroll to explore</span>
-                            <div className="animate-float">
-                                <ChevronDown className="w-6 h-6" aria-hidden="true" />
-                            </div>
-                        </div>
+                            <ChevronDown className="w-6 h-6 animate-float motion-reduce:animate-none" aria-hidden="true" />
+                        </button>
                     </div>
                 </Fragment>
             </section>
         </>
     )
 }
+
+export default LandingSection

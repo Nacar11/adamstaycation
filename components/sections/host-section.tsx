@@ -1,5 +1,3 @@
-'use client'
-
 import Image from 'next/image'
 import { ArrowRight, ArrowUpRight, Mail, Phone, MapPin, type LucideIcon } from 'lucide-react'
 import { AIRBNB_LISTING_URL, CONTACT_EMAIL, MAPS_URL } from '@/lib/constants'
@@ -44,7 +42,7 @@ const contactInfo: ContactItem[] = [
     },
 ]
 
-export default function HostSection() {
+const HostSection = () => {
     return (
         <section
             id="host"
@@ -179,3 +177,5 @@ export default function HostSection() {
         </section>
     )
 }
+
+export default HostSection

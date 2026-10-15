@@ -6,10 +6,7 @@ import {
     SITE_NAME,
     SITE_URL,
 } from '@/lib/constants'
-import { allAmenities, galleryGroups, roomSpecs } from '@/components/sections/experience/data'
-
-const MAX_GUESTS = roomSpecs.find((spec) => spec.label === 'Guests Max')?.numericValue ?? 3
-const FLOOR_SIZE_SQM = roomSpecs.find((spec) => spec.label === 'sqm Space')?.numericValue ?? 35
+import { ROOM, amenities, galleryGroups } from '@/components/sections/experience/data'
 
 // Studio + resort photos as absolute URLs (schema.org consumers require absolute image URLs)
 const listingImages = galleryGroups
@@ -39,20 +36,20 @@ const vacationRental = {
         additionalType: 'EntirePlace',
         occupancy: {
             '@type': 'QuantitativeValue',
-            maxValue: MAX_GUESTS,
+            maxValue: ROOM.maxGuests,
         },
         numberOfRooms: 1,
         bed: {
             '@type': 'BedDetails',
-            numberOfBeds: 1,
+            numberOfBeds: ROOM.queenBeds,
             typeOfBed: 'Queen',
         },
         floorSize: {
             '@type': 'QuantitativeValue',
-            value: FLOOR_SIZE_SQM,
+            value: ROOM.floorSizeSqm,
             unitCode: 'MTK',
         },
-        amenityFeature: allAmenities.map((amenity) => ({
+        amenityFeature: amenities.map((amenity) => ({
             '@type': 'LocationFeatureSpecification',
             name: amenity.title,
             value: true,

@@ -25,15 +25,11 @@ export interface FeaturedHighlight {
 export interface Amenity {
     icon: LucideIcon
     title: string
-    description: string
-    size: 'normal' | 'featured'
-    category: string
 }
 
 export interface RoomSpec {
     icon: LucideIcon
-    value: string
-    numericValue?: number
+    value: number
     label: string
 }
 
@@ -55,7 +51,6 @@ export interface GalleryGroup {
     categories: GalleryCategory[]
 }
 
-// Featured highlights - the "wow" factors with premium styling
 export const featuredHighlights: FeaturedHighlight[] = [
     {
         image: '/images/experience/pool-beach-access.jpg',
@@ -83,21 +78,19 @@ export const featuredHighlights: FeaturedHighlight[] = [
     }
 ]
 
-// Amenities shown in the "Everything Included" strip
-export const allAmenities: Amenity[] = [
-    { icon: Wifi, title: 'High-Speed WiFi', description: 'Work-ready internet', size: 'normal', category: 'essential' },
-    { icon: Waves, title: 'Pool Access', description: 'Multiple resort pools', size: 'normal', category: 'resort' },
-    { icon: Snowflake, title: 'Air Conditioning', description: 'Climate-controlled', size: 'normal', category: 'essential' },
-    { icon: Palmtree, title: 'Beach Access', description: 'Private beach nearby', size: 'normal', category: 'resort' },
-    { icon: ChefHat, title: 'Full Kitchen', description: 'Cook your own meals', size: 'normal', category: 'essential' },
-    { icon: Tv, title: 'Smart TV', description: 'Netflix & streaming', size: 'normal', category: 'entertainment' },
-    { icon: Car, title: 'Free Parking', description: 'Secure on-site', size: 'normal', category: 'essential' },
-    { icon: Monitor, title: 'Workspace', description: 'Dedicated desk area', size: 'normal', category: 'work' },
-    { icon: WashingMachine, title: 'Washer', description: 'In-unit laundry', size: 'normal', category: 'essential' },
-    { icon: Dumbbell, title: 'Fitness Gym', description: 'Stay active', size: 'normal', category: 'wellness' },
+export const amenities: Amenity[] = [
+    { icon: Wifi, title: 'High-Speed WiFi' },
+    { icon: Waves, title: 'Pool Access' },
+    { icon: Snowflake, title: 'Air Conditioning' },
+    { icon: Palmtree, title: 'Beach Access' },
+    { icon: ChefHat, title: 'Full Kitchen' },
+    { icon: Tv, title: 'Smart TV' },
+    { icon: Car, title: 'Free Parking' },
+    { icon: Monitor, title: 'Workspace' },
+    { icon: WashingMachine, title: 'Washer' },
+    { icon: Dumbbell, title: 'Fitness Gym' },
 ]
 
-// Safety features
 export const safetyFeatures: string[] = [
     'Lock on bedroom door',
     'Security cameras (exterior)',
@@ -107,14 +100,15 @@ export const safetyFeatures: string[] = [
     'Noise monitors'
 ]
 
-// Room specifications
+// Single source for room facts — rendered in the Dita grid and the JSON-LD listing
+export const ROOM = { maxGuests: 3, queenBeds: 1, floorSizeSqm: 35 }
+
 export const roomSpecs: RoomSpec[] = [
-    { icon: Users, value: '3', numericValue: 3, label: 'Guests Max' },
-    { icon: BedDouble, value: '1', numericValue: 1, label: 'Queen Bed' },
-    { icon: Maximize, value: '35', numericValue: 35, label: 'sqm Space' },
+    { icon: Users, value: ROOM.maxGuests, label: 'Guests Max' },
+    { icon: BedDouble, value: ROOM.queenBeds, label: 'Queen Bed' },
+    { icon: Maximize, value: ROOM.floorSizeSqm, label: 'sqm Space' },
 ]
 
-// Gallery groups
 export const galleryGroups: GalleryGroup[] = [
     {
         id: 'the-suite',
@@ -240,7 +234,6 @@ export const galleryGroups: GalleryGroup[] = [
     },
 ]
 
-// Flatten all categories for state initialization
 export const allCategories = galleryGroups.flatMap((group) => group.categories)
 
 export const resortAccessImages: GalleryImage[] = [

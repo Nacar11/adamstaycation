@@ -1,6 +1,6 @@
 import { Shield } from 'lucide-react'
 import { BlurFade } from '@/components/ui/blur-fade'
-import { allAmenities, safetyFeatures } from './data'
+import { amenities, safetyFeatures } from './data'
 import { BASE_DELAY } from './constants'
 
 // "Everything Included" amenity pills + safety row
@@ -26,7 +26,7 @@ const EssentialsStrip = () => (
                         role="list"
                         aria-label="Included amenities"
                     >
-                        {allAmenities.map((amenity) => {
+                        {amenities.map((amenity) => {
                             const Icon = amenity.icon
                             return (
                                 <div

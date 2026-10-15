@@ -20,7 +20,7 @@ const navLinks: NavLink[] = [
     { href: '#host', label: 'Host' },
 ]
 
-export default function Navbar() {
+const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -33,16 +33,9 @@ export default function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
 
-    const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
         e.preventDefault()
         if (scrollToTarget(href)) setIsMobileMenuOpen(false)
-    }
-
-    const handleKeyDown = (e: React.KeyboardEvent, href: string) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            if (scrollToTarget(href)) setIsMobileMenuOpen(false)
-        }
     }
 
     return (
@@ -57,16 +50,13 @@ export default function Navbar() {
                 initial={{ y: -100 }}
                 animate={{ y: 0 }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
-                role="navigation"
                 aria-label="Main navigation"
             >
                 <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
                     {/* Logo */}
                     <a
                         href="#home"
-                        onClick={(e) => scrollToSection(e, '#home')}
-                        onKeyDown={(e) => handleKeyDown(e, '#home')}
-                        tabIndex={0}
+                        onClick={(e) => handleNavClick(e, '#home')}
                         className={cn(
                             "font-display text-2xl transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-coral focus:ring-offset-2 rounded-lg px-2 py-1",
                             isScrolled ? "text-ocean-deep" : "text-white"
@@ -82,9 +72,7 @@ export default function Navbar() {
                             <a
                                 key={link.href}
                                 href={link.href}
-                                onClick={(e) => scrollToSection(e, link.href)}
-                                onKeyDown={(e) => handleKeyDown(e, link.href)}
-                                tabIndex={0}
+                                onClick={(e) => handleNavClick(e, link.href)}
                                 className={cn(
                                     "text-sm font-medium transition-colors duration-300 hover:text-coral focus:outline-none focus:ring-2 focus:ring-coral focus:ring-offset-2 rounded px-2 py-1",
                                     isScrolled ? "text-ocean-deep" : "text-white"
@@ -167,7 +155,7 @@ export default function Navbar() {
                                         <a
                                             key={link.href}
                                             href={link.href}
-                                            onClick={(e) => scrollToSection(e, link.href)}
+                                            onClick={(e) => handleNavClick(e, link.href)}
                                             className="text-lg font-medium text-ocean-deep py-3 px-2 border-b border-sand transition-colors hover:text-coral hover:bg-sand-light rounded-lg focus:outline-none focus:ring-2 focus:ring-ocean"
                                             aria-label={`Navigate to ${link.label} section`}
                                         >
@@ -199,3 +187,5 @@ export default function Navbar() {
         </>
     )
 }
+
+export default Navbar
