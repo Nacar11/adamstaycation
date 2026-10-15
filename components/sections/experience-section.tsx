@@ -19,15 +19,17 @@ import {
     Dumbbell,
     Monitor,
     Shield,
-    Ticket,
+    ArrowRight,
     Camera,
     LucideIcon
 } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useInView } from 'framer-motion'
 import { AIRBNB_LISTING_URL } from '@/lib/constants'
 import { BlurFade } from '@/components/ui/blur-fade'
 import { NumberTicker } from '@/components/ui/number-ticker'
 import { cn } from '@/lib/utils'
+import { preloadImage } from '@/lib/preload-image'
+import { ImageShimmer } from '@/components/ui/image-shimmer'
 
 const STAGGER_DELAY = 0.1
 const BASE_DELAY = 0.2
@@ -266,6 +268,16 @@ const galleryGroups: GalleryGroup[] = [
 // Flatten all categories for state initialization
 const allCategories = galleryGroups.flatMap((group) => group.categories)
 
+// Must match the `sizes` on the rendered gallery images so preloads hit the same cached variant
+const GALLERY_MAIN_SIZES = '(max-width: 1024px) 100vw, 1000px'
+const GALLERY_THUMB_SIZES = '(max-width: 1024px) 80px, 185px'
+const RESORT_SIZES = '(max-width: 1024px) 100vw, 42vw'
+const RESORT_AUTOPLAY_INTERVAL = 4000
+const RESORT_PREFETCH_STAGGER = 250
+const ABOUT_GRID_SIZES = '(max-width: 1024px) 50vw, 25vw'
+const PREFETCH_START_DELAY = 800
+const PREFETCH_STAGGER = 400
+
 // Premium Icon Component - Elegant outlined design with gradient glow
 const PremiumIcon = ({
     icon: Icon,
@@ -331,6 +343,18 @@ const aboutGridImages = [
 ]
 
 export default function ExperienceSection() {
+    // Shared image-readiness tracking (keys are `<area>:<src>`) — drives shimmer placeholders
+    const [loadedImages, setLoadedImages] = useState<Set<string>>(() => new Set())
+    const loadedImagesRef = useRef(loadedImages)
+
+    useEffect(() => {
+        loadedImagesRef.current = loadedImages
+    }, [loadedImages])
+
+    const markImageLoaded = useCallback((key: string) => {
+        setLoadedImages((prev) => (prev.has(key) ? prev : new Set(prev).add(key)))
+    }, [])
+
     // Resort access carousel
     const [resortIndex, setResortIndex] = useState(0)
     const [resortHovered, setResortHovered] = useState(false)
@@ -343,11 +367,45 @@ export default function ExperienceSection() {
         setResortIndex((prev) => (prev + 1) % resortAccessImages.length)
     }, [])
 
+    // Autoplay only moves onto a slide that's ready, so it never rotates into a placeholder
+    const handleResortAutoplay = useCallback(() => {
+        setResortIndex((prev) => {
+            const next = (prev + 1) % resortAccessImages.length
+            return loadedImagesRef.current.has(`resort:${resortAccessImages[next].src}`) ? next : prev
+        })
+    }, [])
+
     useEffect(() => {
         if (resortHovered) return
-        const interval = setInterval(nextResort, 4000)
+        const interval = setInterval(handleResortAutoplay, RESORT_AUTOPLAY_INTERVAL)
         return () => clearInterval(interval)
-    }, [nextResort, resortHovered])
+    }, [handleResortAutoplay, resortHovered])
+
+    // Warm every slide, in order, once the carousel approaches the viewport
+    const resortRef = useRef<HTMLDivElement>(null)
+    const isResortNear = useInView(resortRef, { once: true, margin: '600px 0px' })
+
+    useEffect(() => {
+        if (!isResortNear) return
+        const timers = resortAccessImages.map((img, i) =>
+            window.setTimeout(
+                () => preloadImage(img.src, RESORT_SIZES, () => markImageLoaded(`resort:${img.src}`)),
+                i * RESORT_PREFETCH_STAGGER
+            )
+        )
+        return () => timers.forEach((timer) => window.clearTimeout(timer))
+    }, [isResortNear, markImageLoaded])
+
+    // Warm the Dita Building studio grid as it approaches the viewport
+    const aboutGridRef = useRef<HTMLDivElement>(null)
+    const isAboutGridNear = useInView(aboutGridRef, { once: true, margin: '600px 0px' })
+
+    useEffect(() => {
+        if (!isAboutGridNear) return
+        aboutGridImages.forEach((img) => {
+            preloadImage(img.src, ABOUT_GRID_SIZES, () => markImageLoaded(`about:${img.src}`))
+        })
+    }, [isAboutGridNear, markImageLoaded])
 
     const [activeGroupId, setActiveGroupId] = useState(galleryGroups[0].id)
     const [activeCategory, setActiveCategory] = useState(galleryGroups[0].categories[0].id)
@@ -358,6 +416,50 @@ export default function ExperienceSection() {
     const activeGroup = galleryGroups.find((g) => g.id === activeGroupId) || galleryGroups[0]
     const activeGallery = activeGroup.categories.find((cat) => cat.id === activeCategory) || activeGroup.categories[0]
     const currentImageIndex = currentImageIndexes[activeCategory] || 0
+    const currentImage = activeGallery.images[currentImageIndex]
+
+    // ── Gallery prefetching (keeps category/group switches instant) ──
+    const isMainLoaded = loadedImages.has(`main:${currentImage.src}`)
+
+    const prefetchCategory = useCallback((category: GalleryCategory) => {
+        const [firstImage] = category.images
+        if (firstImage) {
+            preloadImage(firstImage.src, GALLERY_MAIN_SIZES, () => markImageLoaded(`main:${firstImage.src}`))
+        }
+        category.images.forEach((img) => {
+            preloadImage(img.src, GALLERY_THUMB_SIZES, () => markImageLoaded(`thumb:${img.src}`))
+        })
+    }, [markImageLoaded])
+
+    const handlePrefetchGroup = (groupId: string) => {
+        const group = galleryGroups.find((g) => g.id === groupId)
+        if (group) prefetchCategory(group.categories[0])
+    }
+
+    // Once the gallery is near the viewport, quietly warm every category in the background
+    const galleryRef = useRef<HTMLDivElement>(null)
+    const isGalleryNear = useInView(galleryRef, { once: true, margin: '600px 0px' })
+
+    useEffect(() => {
+        if (!isGalleryNear) return
+        const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection
+        if (connection?.saveData) return
+
+        const timers = allCategories.map((category, i) =>
+            window.setTimeout(() => prefetchCategory(category), PREFETCH_START_DELAY + i * PREFETCH_STAGGER)
+        )
+        return () => timers.forEach((timer) => window.clearTimeout(timer))
+    }, [isGalleryNear, prefetchCategory])
+
+    // Preload the neighbours of the current photo so prev/next/swipe paint instantly
+    useEffect(() => {
+        const { images } = activeGallery
+        if (images.length < 2) return
+        ;[1, -1].forEach((step) => {
+            const neighbour = images[(currentImageIndex + step + images.length) % images.length]
+            preloadImage(neighbour.src, GALLERY_MAIN_SIZES, () => markImageLoaded(`main:${neighbour.src}`))
+        })
+    }, [activeGallery, currentImageIndex, markImageLoaded])
 
     const handleNextImage = () => {
         setCurrentImageIndexes((prev) => ({
@@ -390,6 +492,25 @@ export default function ExperienceSection() {
         }
     }
 
+    // Keep the active thumbnail fully visible inside the strip (scrolls the strip only, never the page)
+    const thumbStripRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        const strip = thumbStripRef.current
+        const thumb = strip?.children[currentImageIndex] as HTMLElement | undefined
+        if (!strip || !thumb) return
+
+        const stripRect = strip.getBoundingClientRect()
+        const thumbRect = thumb.getBoundingClientRect()
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+        strip.scrollBy({
+            top: thumbRect.top + thumbRect.height / 2 - (stripRect.top + stripRect.height / 2),
+            left: thumbRect.left + thumbRect.width / 2 - (stripRect.left + stripRect.width / 2),
+            behavior: prefersReducedMotion ? 'auto' : 'smooth',
+        })
+    }, [currentImageIndex, activeCategory])
+
     // Touch swipe for mobile gallery
     const touchStartX = useRef(0)
 
@@ -413,20 +534,15 @@ export default function ExperienceSection() {
             <div className="bg-white py-16 md:py-20 lg:py-24">
                 <div className="max-w-7xl mx-auto px-5 md:px-10">
                     <BlurFade delay={BASE_DELAY} inView>
-                        <div className="max-w-2xl mb-14">
-                            <p className="text-ocean/35 text-[10px] uppercase tracking-[0.4em] mb-8 font-medium">
-                                The Experience · Tambuli Seaside Living, Cebu
+                        <div className="max-w-4xl mb-14">
+                            <p className="text-rust text-xs uppercase tracking-[0.22em] mb-5 font-semibold">
+                                The Experience&nbsp;·&nbsp;Tambuli Seaside Living, Cebu
                             </p>
-                            <div className="leading-none mb-6">
-                                <span className="block font-display italic text-ocean-deep/20 text-4xl md:text-5xl lg:text-6xl leading-[1.15] mb-1 select-none">
-                                    Your Luxury
-                                </span>
-                                <span className="block font-display text-ocean-deep text-4xl md:text-5xl lg:text-6xl leading-[1.15] font-bold">
-                                    Escape at Tambuli.
-                                </span>
-                            </div>
-                            <div className="w-8 h-[2px] bg-coral mb-6" />
-                            <p className="text-ocean/55 text-base leading-relaxed">
+                            <h2 className="font-display text-ocean-deep text-4xl md:text-5xl lg:text-[3.5rem] leading-[1.08] tracking-tight mb-6">
+                                Your luxury{' '}
+                                <em className="text-rust whitespace-nowrap">escape at Tambuli.</em>
+                            </h2>
+                            <p className="text-ocean/80 text-base md:text-[17px] leading-[1.75] max-w-2xl">
                                 An 11-hectare residential resort community on the shores of Cebu — every amenity, every comfort, within reach.
                             </p>
                         </div>
@@ -454,7 +570,6 @@ export default function ExperienceSection() {
                                             fill
                                             className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                                             sizes="(max-width: 768px) 100vw, 50vw"
-                                            priority={index < 2}
                                         />
 
                                         {/* Gradient overlay */}
@@ -503,24 +618,16 @@ export default function ExperienceSection() {
                             <div className="px-8 py-16 md:px-12 md:py-20 lg:px-16 lg:py-24 flex flex-col justify-center">
 
                                 <BlurFade delay={BASE_DELAY + STAGGER_DELAY * 0.5} inView>
-                                    <p className="text-ocean/40 text-[10px] uppercase tracking-[0.4em] mb-10 font-medium">
+                                    <p className="text-rust text-xs uppercase tracking-[0.22em] mb-5 font-semibold">
                                         Dita Building&nbsp;·&nbsp;Tambuli Seaside Living&nbsp;·&nbsp;Lapu&#8209;Lapu City, Cebu
                                     </p>
                                 </BlurFade>
 
                                 <BlurFade delay={BASE_DELAY + STAGGER_DELAY} inView>
-                                    <div className="mb-8 leading-none">
-                                        <span className="block font-display italic text-ocean-deep/20 text-4xl md:text-5xl lg:text-[3.25rem] leading-[1.1] mb-1 select-none">
-                                            Welcome to
-                                        </span>
-                                        <span className="block font-display text-ocean-deep text-4xl md:text-5xl lg:text-[3.25rem] leading-[1.1] font-bold">
-                                            Adam&apos;s Staycation
-                                        </span>
-                                    </div>
-                                </BlurFade>
-
-                                <BlurFade delay={BASE_DELAY + STAGGER_DELAY * 1.5} inView>
-                                    <div className="w-10 h-[2px] bg-coral mb-8" />
+                                    <h2 className="font-display text-ocean-deep text-4xl md:text-5xl lg:text-[3.5rem] leading-[1.08] tracking-tight mb-8">
+                                        Welcome to{' '}
+                                        <em className="text-rust whitespace-nowrap">Adam&apos;s Staycation.</em>
+                                    </h2>
                                 </BlurFade>
 
                                 <BlurFade delay={BASE_DELAY + STAGGER_DELAY * 2} inView>
@@ -540,10 +647,10 @@ export default function ExperienceSection() {
                                             },
                                         ].map((item, i) => (
                                             <div key={i} className="flex gap-3 items-start">
-                                                <div className="w-1 h-1 rounded-full bg-coral mt-[9px] flex-shrink-0" />
-                                                <p className="text-[15px] leading-relaxed">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-rust mt-[10px] flex-shrink-0" aria-hidden="true" />
+                                                <p className="text-base leading-[1.7]">
                                                     <span className="text-ocean-deep font-semibold">{item.highlight} </span>
-                                                    <span className="text-ocean/50">{item.detail}</span>
+                                                    <span className="text-ocean/75">{item.detail}</span>
                                                 </p>
                                             </div>
                                         ))}
@@ -565,12 +672,12 @@ export default function ExperienceSection() {
                                         <BlurFade key={item.title} delay={BASE_DELAY + STAGGER_DELAY * (3 + i)} inView>
                                             <div className={cn(
                                                 "py-7",
-                                                i > 0 && "border-t border-ocean/8"
+                                                i > 0 && "border-t border-sand-dark/50"
                                             )}>
-                                                <h4 className="text-ocean-deep font-semibold text-sm mb-2">
+                                                <h3 className="font-display text-ocean-deep text-xl mb-2">
                                                     {item.title}
-                                                </h4>
-                                                <p className="text-ocean/50 text-[15px] leading-relaxed max-w-xs">
+                                                </h3>
+                                                <p className="text-ocean/75 text-[15px] leading-relaxed max-w-sm">
                                                     {item.body}
                                                 </p>
                                             </div>
@@ -580,16 +687,21 @@ export default function ExperienceSection() {
                             </div>
 
                             {/* ── Right: 2×2 Studio Image Grid ── */}
-                            <div className="relative min-h-[460px] lg:min-h-0 overflow-hidden lg:rounded-l-2xl">
+                            <div ref={aboutGridRef} className="relative min-h-[460px] lg:min-h-0 overflow-hidden lg:rounded-l-2xl">
                                 <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-1">
                                     {aboutGridImages.map((img) => (
-                                        <div key={img.src} className="relative overflow-hidden">
+                                        <div key={img.src} className="relative overflow-hidden bg-sand">
+                                            <ImageShimmer visible={!loadedImages.has(`about:${img.src}`)} />
                                             <Image
                                                 src={img.src}
                                                 alt={img.alt}
                                                 fill
-                                                className="object-cover transition-transform duration-700 ease-out hover:scale-105"
-                                                sizes="(max-width: 1024px) 50vw, 25vw"
+                                                className={cn(
+                                                    "object-cover transition-[opacity,transform] duration-700 ease-out hover:scale-105",
+                                                    loadedImages.has(`about:${img.src}`) ? "opacity-100" : "opacity-0"
+                                                )}
+                                                sizes={ABOUT_GRID_SIZES}
+                                                onLoad={() => markImageLoaded(`about:${img.src}`)}
                                             />
                                         </div>
                                     ))}
@@ -687,12 +799,13 @@ export default function ExperienceSection() {
             {/* ================================ */}
             {/* RESORT ACCESS                   */}
             {/* ================================ */}
-            <div className="bg-sand-light overflow-hidden">
+            <div className="bg-ocean-deep overflow-hidden">
                 <div className="max-w-7xl mx-auto">
                     <div className="grid lg:grid-cols-12 min-h-[580px] md:min-h-[620px] lg:gap-6">
 
                         {/* Left — Auto-play carousel */}
                         <div
+                            ref={resortRef}
                             className="lg:col-span-5 relative min-h-[360px] lg:min-h-0 order-2 lg:order-1 overflow-hidden lg:rounded-r-2xl"
                             onMouseEnter={() => setResortHovered(true)}
                             onMouseLeave={() => setResortHovered(false)}
@@ -703,13 +816,18 @@ export default function ExperienceSection() {
                                 style={{ transform: `translateX(-${resortIndex * 100}%)` }}
                             >
                                 {resortAccessImages.map((img) => (
-                                    <div key={img.src} className="relative flex-shrink-0 w-full h-full">
+                                    <div key={img.src} className="relative flex-shrink-0 w-full h-full bg-ocean">
+                                        <ImageShimmer tone="dark" visible={!loadedImages.has(`resort:${img.src}`)} />
                                         <Image
                                             src={img.src}
                                             alt={img.alt}
                                             fill
-                                            className="object-cover"
-                                            sizes="(max-width: 1024px) 100vw, 42vw"
+                                            className={cn(
+                                                "object-cover transition-opacity duration-500 ease-out",
+                                                loadedImages.has(`resort:${img.src}`) ? "opacity-100" : "opacity-0"
+                                            )}
+                                            sizes={RESORT_SIZES}
+                                            onLoad={() => markImageLoaded(`resort:${img.src}`)}
                                         />
                                     </div>
                                 ))}
@@ -755,52 +873,45 @@ export default function ExperienceSection() {
                             <BlurFade delay={BASE_DELAY + STAGGER_DELAY} inView>
 
                                 {/* Label */}
-                                <p className="text-ocean/35 text-[10px] uppercase tracking-[0.4em] mb-8 font-medium">
-                                    Resort Amenities Access
+                                <p className="text-peach text-xs uppercase tracking-[0.22em] mb-5 font-semibold">
+                                    Resort Amenities Access&nbsp;·&nbsp;Pool&nbsp;·&nbsp;Beach&nbsp;·&nbsp;Gym
                                 </p>
 
-                                {/* Heading — same editorial pattern as About */}
-                                <div className="mb-6 leading-none">
-                                    <span className="block font-display italic text-ocean-deep/20 text-3xl md:text-4xl lg:text-[2.75rem] leading-[1.15] mb-1 select-none">
-                                        Pool. Beach. Gym.
-                                    </span>
-                                    <span className="block font-display text-ocean-deep text-3xl md:text-4xl lg:text-[2.75rem] leading-[1.15] font-bold">
-                                        Access on Your Terms.
-                                    </span>
-                                </div>
-
-                                {/* Coral rule */}
-                                <div className="w-8 h-[2px] bg-coral mb-7" />
+                                {/* Heading — navy/cream + italic accent, shared with Host & Gallery */}
+                                <h2 className="font-display text-sand-light text-4xl md:text-5xl lg:text-[3.5rem] leading-[1.08] tracking-tight mb-6">
+                                    Pool. Beach. Gym.
+                                    <em className="block text-peach">Access on your terms.</em>
+                                </h2>
 
                                 {/* Descriptor */}
-                                <p className="text-ocean/55 text-sm leading-relaxed max-w-sm mb-10">
-                                    One pass unlocks <span className="text-ocean-deep font-semibold">all three</span> — pool, beach, and gym together. No separate fees, no restrictions.
+                                <p className="text-sand-light/80 text-base leading-[1.75] max-w-md mb-10">
+                                    One pass unlocks all three — pool, beach, and gym together. No separate fees, no restrictions.
                                 </p>
 
-                                {/* Tier split — no cards, editorial columns */}
-                                <div className="grid grid-cols-2 mb-10">
+                                {/* Tier cards */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10 max-w-xl">
 
                                     {/* Short stay */}
-                                    <div className="pr-8 border-r border-ocean/10">
-                                        <p className="text-[9px] uppercase tracking-[0.35em] text-ocean/35 font-medium mb-4">Day Pass</p>
-                                        <p className="font-display text-[2rem] text-ocean-deep font-bold leading-none mb-1">
+                                    <div className="rounded-2xl bg-sand-light p-6 md:p-7">
+                                        <p className="text-[11px] uppercase tracking-[0.2em] text-rust font-semibold mb-3">Day Pass</p>
+                                        <p className="font-display text-[2.5rem] text-ocean-deep leading-none mb-2 tabular-nums">
                                             &#8369;900
                                         </p>
-                                        <p className="text-[11px] text-ocean/40 mb-4">per person / per day</p>
-                                        <p className="text-xs text-ocean/40 leading-relaxed">
-                                            Vouchers available at check-in.<br />Ideal for 1–7 day bookings.
+                                        <p className="text-sm text-ocean/75 mb-5">per person / per day</p>
+                                        <p className="text-sm text-ocean/75 leading-relaxed pt-5 border-t border-sand-dark/50">
+                                            Vouchers available at check-in. Ideal for 1–7 day bookings.
                                         </p>
                                     </div>
 
                                     {/* Long stay */}
-                                    <div className="pl-8">
-                                        <p className="text-[9px] uppercase tracking-[0.35em] text-ocean/35 font-medium mb-4">Long Stay</p>
-                                        <p className="font-display italic text-[1.6rem] text-coral font-medium leading-none mb-1">
+                                    <div className="rounded-2xl bg-white/[0.06] border border-sand-light/15 p-6 md:p-7">
+                                        <p className="text-[11px] uppercase tracking-[0.2em] text-peach font-semibold mb-3">Long Stay</p>
+                                        <p className="font-display text-[1.75rem] lg:text-[1.5rem] xl:text-[1.875rem] text-sand-light leading-none mb-2 whitespace-nowrap">
                                             Complimentary
                                         </p>
-                                        <p className="text-[11px] text-ocean/40 mb-4">from 3 weeks onward</p>
-                                        <p className="text-xs text-ocean/40 leading-relaxed">
-                                            Full resort access included.<br />Terms negotiable.
+                                        <p className="text-sm text-sand-light/75 mb-5">from 3 weeks onward</p>
+                                        <p className="text-sm text-sand-light/75 leading-relaxed pt-5 border-t border-sand-light/15">
+                                            Full resort access included. Terms negotiable.
                                         </p>
                                     </div>
 
@@ -811,11 +922,11 @@ export default function ExperienceSection() {
                                     href={AIRBNB_LISTING_URL}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full border border-ocean/20 text-ocean text-sm font-medium hover:bg-ocean hover:text-white hover:border-ocean transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-ocean/40 w-fit"
-                                    aria-label="Check availability on Airbnb"
+                                    className="group inline-flex items-center gap-2 h-12 px-7 rounded-full bg-peach text-ocean-deep text-[15px] font-semibold transition-colors duration-200 hover:bg-sand-light cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-peach focus-visible:ring-offset-2 focus-visible:ring-offset-ocean-deep w-fit"
+                                    aria-label="Check availability on Airbnb (opens in new tab)"
                                 >
-                                    <Ticket className="w-4 h-4 flex-shrink-0" strokeWidth={1.5} aria-hidden="true" />
-                                    Check Availability
+                                    Check availability
+                                    <ArrowRight className="w-4 h-4 flex-shrink-0 transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transition-none" strokeWidth={2} aria-hidden="true" />
                                 </a>
 
                             </BlurFade>
@@ -834,18 +945,14 @@ export default function ExperienceSection() {
                     {/* Header row: editorial label + heading + group toggle */}
                     <BlurFade delay={BASE_DELAY} inView>
                         <div className="mb-10">
-                            <p className="text-ocean/35 text-[10px] uppercase tracking-[0.4em] mb-8 font-medium">
+                            <p className="text-rust text-xs uppercase tracking-[0.22em] mb-5 font-semibold">
                                 Photo Gallery
                             </p>
-                            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-6">
-                                <div className="leading-none">
-                                    <span className="block font-display italic text-ocean-deep/20 text-3xl md:text-[2.5rem] leading-[1.15] mb-1 select-none">
-                                        Every Corner.
-                                    </span>
-                                    <span className="block font-display text-ocean-deep text-3xl md:text-[2.5rem] leading-[1.15] font-bold">
-                                        Every Detail.
-                                    </span>
-                                </div>
+                            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5">
+                                <h2 className="font-display text-ocean-deep text-4xl md:text-5xl lg:text-[3.5rem] leading-[1.08] tracking-tight">
+                                    Every corner.{' '}
+                                    <em className="text-rust">Every detail.</em>
+                                </h2>
 
                                 {/* Group toggle — right-aligned */}
                                 <div
@@ -857,6 +964,8 @@ export default function ExperienceSection() {
                                         <motion.button
                                             key={group.id}
                                             onClick={() => handleGroupChange(group.id)}
+                                            onPointerEnter={() => handlePrefetchGroup(group.id)}
+                                            onFocus={() => handlePrefetchGroup(group.id)}
                                             role="tab"
                                             aria-selected={activeGroupId === group.id}
                                             whileTap={{ scale: 0.95 }}
@@ -873,7 +982,6 @@ export default function ExperienceSection() {
                                     ))}
                                 </div>
                             </div>
-                            <div className="w-8 h-[2px] bg-coral" />
                         </div>
                     </BlurFade>
 
@@ -895,6 +1003,8 @@ export default function ExperienceSection() {
                                         whileTap={{ scale: 0.92 }}
                                         transition={{ duration: 0.2, ease: 'easeOut' }}
                                         onClick={() => setActiveCategory(category.id)}
+                                        onPointerEnter={() => prefetchCategory(category)}
+                                        onFocus={() => prefetchCategory(category)}
                                         role="tab"
                                         aria-selected={activeCategory === category.id}
                                         className={cn(
@@ -914,6 +1024,7 @@ export default function ExperienceSection() {
                     {/* Gallery — main image + thumbnail strip */}
                     <BlurFade delay={BASE_DELAY + STAGGER_DELAY * 1.5} inView>
                         <div
+                            ref={galleryRef}
                             className="grid grid-cols-1 lg:grid-cols-[1fr_185px] gap-3"
                             role="tabpanel"
                             id={`gallery-panel-${activeCategory}`}
@@ -925,21 +1036,30 @@ export default function ExperienceSection() {
                                 onTouchStart={handleTouchStart}
                                 onTouchEnd={handleTouchEnd}
                             >
+                                <ImageShimmer visible={!isMainLoaded} />
+
                                 <AnimatePresence>
-                                    <motion.img
+                                    <motion.div
                                         key={`${activeCategory}-${currentImageIndex}`}
-                                        src={activeGallery.images[currentImageIndex].src}
-                                        alt={activeGallery.images[currentImageIndex].alt}
                                         initial={{ opacity: 0, scale: 1.04 }}
-                                        animate={{ opacity: 1, scale: 1 }}
+                                        animate={isMainLoaded ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 1.04 }}
                                         exit={{ opacity: 0 }}
                                         whileHover={{ scale: 1.04 }}
                                         transition={{
                                             opacity: { duration: 0.4, ease: 'easeOut' },
                                             scale: { duration: 0.65, ease: 'easeOut', type: 'tween' },
                                         }}
-                                        className="absolute inset-0 w-full h-full object-cover cursor-zoom-in"
-                                    />
+                                        className="absolute inset-0 cursor-zoom-in"
+                                    >
+                                        <Image
+                                            src={currentImage.src}
+                                            alt={currentImage.alt}
+                                            fill
+                                            sizes={GALLERY_MAIN_SIZES}
+                                            className="object-cover"
+                                            onLoad={() => markImageLoaded(`main:${currentImage.src}`)}
+                                        />
+                                    </motion.div>
                                 </AnimatePresence>
 
                                 {/* Gradient scrim */}
@@ -987,33 +1107,45 @@ export default function ExperienceSection() {
                                 )}
                             </div>
 
-                            {/* Thumbnail strip — vertical on desktop, horizontal scroll on mobile */}
-                            <div className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto lg:max-h-[500px] [&::-webkit-scrollbar]:w-0 [scrollbar-width:none]">
-                                {activeGallery.images.map((img, i) => (
-                                    <motion.button
-                                        key={i}
-                                        onClick={() => handleDotClick(i)}
-                                        whileTap={{ scale: 0.94 }}
-                                        transition={{ duration: 0.12, ease: 'easeOut' }}
-                                        aria-label={`View image ${i + 1} of ${activeGallery.images.length}`}
-                                        aria-current={i === currentImageIndex ? 'true' : undefined}
-                                        className={cn(
-                                            "relative flex-shrink-0 w-20 h-14 lg:w-full lg:h-auto lg:aspect-[4/3]",
-                                            "rounded-xl overflow-hidden cursor-pointer transition-all duration-200",
-                                            "focus:outline-none focus:ring-2 focus:ring-coral focus:ring-offset-2 focus:ring-offset-white",
-                                            i === currentImageIndex
-                                                ? "ring-2 ring-coral ring-offset-2 ring-offset-white opacity-100"
-                                                : "opacity-50 hover:opacity-85"
-                                        )}
-                                    >
-                                        <img
-                                            src={img.src}
-                                            alt=""
-                                            aria-hidden="true"
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </motion.button>
-                                ))}
+                            {/* Thumbnail strip — vertical on desktop (height locked to the main image), horizontal scroll on mobile */}
+                            <div className="relative">
+                                <div
+                                    ref={thumbStripRef}
+                                    className="flex flex-row lg:flex-col gap-2 p-1 overflow-x-auto lg:absolute lg:inset-0 lg:overflow-x-hidden lg:overflow-y-auto [&::-webkit-scrollbar]:hidden [scrollbar-width:none]"
+                                >
+                                    {activeGallery.images.map((img, i) => (
+                                        <motion.button
+                                            key={i}
+                                            onClick={() => handleDotClick(i)}
+                                            whileTap={{ scale: 0.94 }}
+                                            transition={{ duration: 0.12, ease: 'easeOut' }}
+                                            aria-label={`View image ${i + 1} of ${activeGallery.images.length}`}
+                                            aria-current={i === currentImageIndex ? 'true' : undefined}
+                                            className={cn(
+                                                "relative flex-shrink-0 w-20 h-14 lg:w-full lg:h-auto lg:aspect-[4/3]",
+                                                "rounded-xl overflow-hidden cursor-pointer transition-all duration-200 bg-sand",
+                                                "focus:outline-none focus:ring-2 focus:ring-coral focus:ring-offset-2 focus:ring-offset-white",
+                                                i === currentImageIndex
+                                                    ? "ring-2 ring-coral ring-offset-2 ring-offset-white opacity-100"
+                                                    : "opacity-50 hover:opacity-85"
+                                            )}
+                                        >
+                                            <ImageShimmer visible={!loadedImages.has(`thumb:${img.src}`)} />
+                                            <Image
+                                                src={img.src}
+                                                alt=""
+                                                aria-hidden="true"
+                                                fill
+                                                sizes={GALLERY_THUMB_SIZES}
+                                                className={cn(
+                                                    "object-cover transition-opacity duration-300 ease-out",
+                                                    loadedImages.has(`thumb:${img.src}`) ? "opacity-100" : "opacity-0"
+                                                )}
+                                                onLoad={() => markImageLoaded(`thumb:${img.src}`)}
+                                            />
+                                        </motion.button>
+                                    ))}
+                                </div>
                             </div>
 
                         </div>

@@ -39,6 +39,10 @@ Static property images live in `public/images/` organized by room/area (studio, 
 | `ocean` | `#1E4D5C` | Primary text, CTAs, navigation |
 | `ocean-deep` | `#0D2B33` | Headings, overlays |
 | `coral` | `#E07A5F` | Accent CTAs, highlights |
+| `rust` | `#A8472A` | Text accent on light backgrounds: eyebrow labels, italic heading accents, primary CTA fill |
+| `peach` | `#F0A98C` | Text accent on `ocean-deep` backgrounds: eyebrows, italic heading accents, CTA fill |
+
+**Heading pattern:** `font-display` regular weight in `ocean-deep` (or `sand-light` on dark), with the second phrase in `<em>` using `rust` (or `peach` on dark). Example: `Every corner. <em className="text-rust">Every detail.</em>`
 
 ### Typography
 - `font-display` (Playfair Display) — H1/H2 display headings

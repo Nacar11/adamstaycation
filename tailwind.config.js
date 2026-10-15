@@ -19,6 +19,11 @@ module.exports = {
   				deep: '#0D2B33'
   			},
   			coral: '#E07A5F',
+  			rust: {
+  				DEFAULT: '#A8472A',
+  				dark: '#8C3A22'
+  			},
+  			peach: '#F0A98C',
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {
@@ -74,9 +79,18 @@ module.exports = {
   			'fade-in': 'fadeIn 0.6s ease-out forwards',
   			'slide-up': 'slideUp 0.5s ease-out forwards',
   			stagger: 'stagger 0.05s ease-out forwards',
-  			float: 'float 3s ease-in-out infinite'
+  			float: 'float 3s ease-in-out infinite',
+  			'skeleton-shimmer': 'skeletonShimmer 1.6s ease-in-out infinite'
   		},
   		keyframes: {
+  			skeletonShimmer: {
+  				'0%': {
+  					transform: 'translateX(-100%)'
+  				},
+  				'100%': {
+  					transform: 'translateX(100%)'
+  				}
+  			},
   			fadeIn: {
   				'0%': {
   					opacity: '0'
