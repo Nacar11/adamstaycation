@@ -61,7 +61,50 @@ interface DotPatternProps extends React.SVGProps<SVGSVGElement> {
  * - Dots color can be controlled via the text color utility classes
  */
 
-export function DotPattern({
+export function DotPattern({ glow = false, ...props }: DotPatternProps) {
+  // Static dots don't need per-dot React/motion nodes: one SVG <pattern> paints the same grid.
+  // (The per-dot version mounts ~5,000 motion.circle components on a desktop-sized hero.)
+  return glow ? <AnimatedDotPattern {...props} /> : <StaticDotPattern {...props} />
+}
+
+function StaticDotPattern({
+  width = 16,
+  height = 16,
+  // x/y are accepted for API parity but unused — same as the original per-dot version
+  x: _x,
+  y: _y,
+  cx = 1,
+  cy = 1,
+  cr = 1,
+  className,
+  ...props
+}: DotPatternProps) {
+  const id = useId()
+  return (
+    <svg
+      aria-hidden="true"
+      className={cn(
+        "pointer-events-none absolute inset-0 h-full w-full text-neutral-400/80",
+        className
+      )}
+      {...props}
+    >
+      <defs>
+        <pattern
+          id={`${id}-dots`}
+          width={width}
+          height={height}
+          patternUnits="userSpaceOnUse"
+        >
+          <circle cx={cx} cy={cy} r={cr} fill="currentColor" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill={`url(#${id}-dots)`} />
+    </svg>
+  )
+}
+
+function AnimatedDotPattern({
   width = 16,
   height = 16,
   x = 0,
@@ -70,9 +113,9 @@ export function DotPattern({
   cy = 1,
   cr = 1,
   className,
-  glow = false,
   ...props
 }: DotPatternProps) {
+  const glow = true
   const id = useId()
   const containerRef = useRef<SVGSVGElement>(null)
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
