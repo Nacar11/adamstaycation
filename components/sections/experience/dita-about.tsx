@@ -42,9 +42,8 @@ const DitaAbout = () => {
                                     {aboutHighlights.map((item) => (
                                         <div key={item.highlight} className="flex gap-3 items-start">
                                             <div className="w-1.5 h-1.5 rounded-full bg-rust mt-[10px] flex-shrink-0" aria-hidden="true" />
-                                            <p className="text-base leading-[1.7]">
-                                                <span className="text-ocean-deep font-semibold">{item.highlight} </span>
-                                                <span className="text-ocean/80">{item.detail}</span>
+                                            <p className="text-base leading-[1.7] text-ocean-deep">
+                                                <span className="font-bold">{item.highlight}</span> {item.detail}
                                             </p>
                                         </div>
                                     ))}
@@ -54,8 +53,8 @@ const DitaAbout = () => {
                             {arrivalSteps.map((item, i) => (
                                 <BlurFade key={item.title} delay={BASE_DELAY + STAGGER_DELAY * (3 + i)} inView>
                                     <div className={cn('py-7', i > 0 && 'border-t border-sand-dark/50')}>
-                                        <h3 className="font-display text-ocean-deep text-xl mb-2">{item.title}</h3>
-                                        <p className="text-ocean/80 text-[15px] leading-relaxed max-w-sm">{item.body}</p>
+                                        <h3 className="font-display font-semibold text-ocean-deep text-xl mb-2">{item.title}</h3>
+                                        <p className="text-ocean-deep text-[15px] leading-relaxed max-w-sm">{item.body}</p>
                                     </div>
                                 </BlurFade>
                             ))}
