@@ -27,7 +27,6 @@ module.exports = {
         sans: ['var(--font-inter)', 'sans-serif'],
       },
       animation: {
-        float: 'float 3s ease-in-out infinite',
         'skeleton-shimmer': 'skeletonShimmer 1.6s ease-in-out infinite',
         // CSS twin of BlurFade so above-the-fold reveals paint without JS
         'blur-fade-in': 'blurFadeIn 0.4s ease-out both',
@@ -35,10 +34,6 @@ module.exports = {
         'spin-around': 'spinAround calc(var(--speed) * 2) infinite linear',
       },
       keyframes: {
-        float: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-10px)' },
-        },
         skeletonShimmer: {
           '0%': { transform: 'translateX(-100%)' },
           '100%': { transform: 'translateX(100%)' },

@@ -77,7 +77,7 @@ Text must meet WCAG AA (4.5:1). Hex values live only in `tailwind.config.js` and
 ### Utilities (`app/globals.css` / `tailwind.config.js`)
 - `glass-effect` — translucent glass button background
 - `animate-blur-fade-in` — CSS twin of `BlurFade`; use for above-the-fold reveals so LCP text paints without JS
-- `animate-skeleton-shimmer`, `animate-float`
+- `animate-skeleton-shimmer`
 
 ## Magic UI Integration
 
