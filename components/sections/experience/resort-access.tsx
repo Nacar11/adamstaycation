@@ -108,10 +108,10 @@ const ResortAccess = () => {
                     <div className="lg:col-span-7 px-8 py-14 md:px-12 md:py-16 lg:px-16 lg:py-20 flex flex-col justify-center order-1 lg:order-2">
                         <BlurFade delay={BASE_DELAY + STAGGER_DELAY} inView>
 
-                            <SectionEyebrow tone="dark">
+                            <SectionEyebrow tone="dark" className="text-coral">
                                 Resort Amenities Access&nbsp;·&nbsp;Pool&nbsp;·&nbsp;Beach&nbsp;·&nbsp;Gym
                             </SectionEyebrow>
-                            <SectionHeading tone="dark" lead="Pool. Beach. Gym." accent="Access on your terms." accentOnNewLine className="mb-6" />
+                            <SectionHeading tone="dark" lead="Pool. Beach. Gym." accent="Access on your terms." accentOnNewLine className="mb-6" accentClassName="text-coral" />
                             <p className="text-sand-light/80 text-base leading-[1.75] max-w-md mb-10">
                                 One pass unlocks all three — pool, beach, and gym together. No separate fees, no restrictions.
                             </p>
@@ -130,7 +130,7 @@ const ResortAccess = () => {
                                 </div>
 
                                 <div className="rounded-2xl bg-white/[0.06] border border-sand-light/15 p-6 md:p-7">
-                                    <p className="text-[11px] uppercase tracking-[0.2em] text-peach font-semibold mb-3">Long Stay</p>
+                                    <p className="text-[11px] uppercase tracking-[0.2em] text-coral font-semibold mb-3">Long Stay</p>
                                     <p className="font-display text-[1.75rem] lg:text-[1.5rem] xl:text-[1.875rem] text-sand-light leading-none mb-2 whitespace-nowrap">
                                         Complimentary
                                     </p>
@@ -144,7 +144,7 @@ const ResortAccess = () => {
 
                             <AirbnbLink
                                 ariaLabel="Check availability on Airbnb (opens in new tab)"
-                                className="group inline-flex items-center gap-2 h-12 px-7 rounded-full bg-peach text-ocean-deep text-[15px] font-semibold transition-colors duration-200 hover:bg-sand-light cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-peach focus-visible:ring-offset-2 focus-visible:ring-offset-ocean-deep w-fit"
+                                className="group inline-flex items-center gap-2 h-12 px-7 rounded-full bg-gradient-to-br from-coral to-coral-dark text-white text-[15px] font-semibold transition-[filter] duration-200 hover:brightness-110 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-coral focus-visible:ring-offset-2 focus-visible:ring-offset-ocean-deep w-fit"
                             >
                                 Check availability
                                 <ArrowRight className="w-4 h-4 flex-shrink-0 transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transition-none" strokeWidth={2} aria-hidden="true" />
